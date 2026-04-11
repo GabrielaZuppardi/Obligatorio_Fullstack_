@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 
-export const authenticateJwToken = (req, res, next) => {
+export const authenticateMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ mensaje: "Token no proporcionado" });
 
