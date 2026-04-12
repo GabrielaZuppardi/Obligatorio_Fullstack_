@@ -3,10 +3,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import v1Router from "./v1/index.js"; // Importar rutas de la versión 1    
 import { notFoundMiddleware } from './v1/middlewares/notFound.middleware.js';
+import connectDB from './v1/config/db.config.js'; // Importar función para conectar a la base de datos 
 
 dotenv.config();
 
 const app = express();
+connectDB(); // Llamar a la función para conectar a la base de datos
 
 app.use(cors(/*{
   origin:"http://localhost:5500",

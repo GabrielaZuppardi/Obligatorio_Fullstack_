@@ -1,26 +1,38 @@
-import express from 'express';
+ import { obtenerCategoriasService, 
+          obtenerCategoriaPorIdService, 
+          crearCategoriasService,
+          actualizarCategoriaService,
+          eliminarCategoriaService } from "../services/categorias.services.js";
 
 
-export const obtenerCategorias = (req, res) => {
-    res.json({ mensaje: "Obtener todas las categorías" });
+
+export const obtenerCategoriasController = async(req, res) => {
+    const categorias = await obtenerCategoriasService();
+    res.json({ mensaje: "Obtener todas las categorías", categorias });
 }   
 
-export const obtenerCategoriaPorId = (req, res) => {
+export const obtenerCategoriaPorIdController = async (req, res) => {
     const { id } = req.params;
-    res.json({ mensaje: `Obtener categoría con ID: ${id}` });
+    const categoria = await obtenerCategoriaPorIdService(id);
+    res.json({ mensaje: categoria });
 }   
 
-export const crearCategoria = (req, res) => {
-       res.json({ mensaje: `Crear categoría` });
+export const crearCategoriaController = async (req, res) => {
+   const categoriaCreada = await crearCategoriasService(req.body);
+       res.json({ mensaje: `Producto creado`, producto: categoriaCreada });
+} 
+
+
+export const actualizarCategoriaController = async (req, res) => {
+    const { id } = req.params;
+    const categoriaActualizada = await actualizarCategoriaService(id, req.body);
+    res.json({ mensaje: `Categoría actualizada`, categoria: categoriaActualizada });
 }
 
-export const actualizarCategoria = (req, res) => {
+export const eliminarCategoriaController = async(req, res) => {
     const { id } = req.params;
-    res.json({ mensaje: `Actualizar categoría` });
+    const categoriaEliminada = await eliminarCategoriaService(id);
+    res.json({ mensaje: `Categoría eliminada`, categoria: categoriaEliminada });
 }
 
-export const eliminarCategoria = (req, res) => {
-    const { id } = req.params;
-    res.json({ mensaje: `Eliminar categoría` });
-}
 
