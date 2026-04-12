@@ -1,17 +1,17 @@
 import express from 'express';
-import {obtenerCategorias, 
-        obtenerCategoriaPorId, 
-        crearCategoria, 
-        actualizarCategoria, 
-        eliminarCategoria} from "../controllers/categorias.controllers.js";
+import {obtenerCategoriasController, 
+        obtenerCategoriaPorIdController, 
+        crearCategoriaController, 
+        actualizarCategoriaController, 
+        eliminarCategoriaController} from "../controllers/categorias.controllers.js";
 
 
 const router = express.Router({mergeParams: true });
 
-router.get("/", obtenerCategorias);
-router.get("/:id", obtenerCategoriaPorId);
-router.post("/", crearCategoria);
-router.patch("/:id", actualizarCategoria);
-router.delete("/:id", eliminarCategoria);
+router.get("/", obtenerCategoriasController);
+router.get("/:id", obtenerCategoriaPorIdController);
+router.post("/", crearCategoriaController);
+router.patch("/:id", actualizarCategoriaController);
+router.delete("/:id", eliminarCategoriaController);
 
 export default router;
