@@ -2,45 +2,50 @@ import mongoose from "mongoose";
 
 const recipeSchema = new mongoose.Schema(
   {
-    title: {
+    titulo: {
       type: String,
       required: true,
       trim: true
     },
-    description: {
+    descripcion: {
       type: String,
       required: true,
       trim: true,
       maxlength: 300
     },
-    ingredients: {
+    ingredientes: {
       type: [String],
       required: true
     },
-    steps: {
+    pasos: {
       type: [String],
       required: true
     },
-    preparationTime: {
+    tiempoPreparacion: {
       type: Number,
       required: true,
       min: 1
     },
-    difficulty: {
+    
+    dificultad: {
       type: String,
       enum: ["facil", "media", "dificil"],
       required: true
     },
-    servings: {
+    porciones: {
       type: Number,
       required: true,
       min: 1
     },
     imageUrl: {
       type: String
-    }
+    },
+
+    //falta asociarlo con CATEGORIA y USUARIO, pero eso lo haré después
   },
   {
     timestamps: true
   }
 );
+
+export default mongoose.model('Receta', recipeSchema);
