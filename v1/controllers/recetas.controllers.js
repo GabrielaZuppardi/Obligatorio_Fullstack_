@@ -2,7 +2,7 @@ import {obtenerRecetasService,
         obtenerRecetaPorIdService, 
         crearRecetaService, 
         actualizarRecetaService, 
-        eliminarRecetaService} from "../services/recetas.service.js";
+        eliminarRecetaService} from "../services/recetas.services.js";
 
 export const obtenerRecetasController = async(req, res) => {
     const recetas = await obtenerRecetasService();
