@@ -29,6 +29,10 @@ export const actualizarCategoriaController = async (req, res) => {
     res.json({ mensaje: `Categoría actualizada`, categoria: categoriaActualizada });
 }
 
+/*export const actualizarCategoriaService = async (id, categoria) =>
+    let productoActualizado = await Categoria.findByIdAndUpdate(id, categoria, { new: true })
+    return productoActualizado;*/ 
+
 export const eliminarCategoriaController = async(req, res) => {
     const { id } = req.params;
     const categoriaEliminada = await eliminarCategoriaService(id);
