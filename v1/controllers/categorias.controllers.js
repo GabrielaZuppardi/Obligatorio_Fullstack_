@@ -29,10 +29,18 @@ export const actualizarCategoriaController = async (req, res) => {
     res.json({ mensaje: `Categoría actualizada`, categoria: categoriaActualizada });
 }
 
+
+
 export const eliminarCategoriaController = async(req, res) => {
     const { id } = req.params;
     const categoriaEliminada = await eliminarCategoriaService(id);
     res.json({ mensaje: `Categoría eliminada`, categoria: categoriaEliminada });
 }
 
-
+/*ACA DEJO UN EJEMPLO DE UNA BUSQUEDA POR RANGO
+export const obtenerProductosPorRangoPrecioController = async (req, res) => {
+    const { min, max } = req.params;
+    const productos = await obtenerProductosPorRangoPrecioService(min, max);
+    res.json({ mensaje: "Productos obtenidos por rango de precio", productos });
+}
+*/
