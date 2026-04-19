@@ -28,3 +28,11 @@ export const eliminarCategoriaService = async (id) => {
     return categoriaEliminada;
 }
     
+
+/*ACA DEJO UN EJEMPLO DE UNA BUSQUEDA POR RANGO
+export const obtenerProductosPorRangoPrecioService = async (min, max) => {
+    const productos = await Producto.find({ precio: { $gte: min, $lte: max } });
+    return productos;
+}
+
+*/

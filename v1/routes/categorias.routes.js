@@ -15,4 +15,9 @@ router.post("/", validateBody(crearCategoriaSchema), crearCategoriaController);
 router.patch("/:id", validateBody(modificarCategoriaSchema), actualizarCategoriaController);
 router.delete("/:id", eliminarCategoriaController);
 
+
+/*ACA DEJO UN EJEMPLO DE UNA BUSQUEDA POR RANGO
+router.get("/precio/:min/:max", obtenerProductosPorRangoPrecioController);
+*/
+
 export default router;
