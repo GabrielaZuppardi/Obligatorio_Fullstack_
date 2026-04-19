@@ -4,7 +4,7 @@
           actualizarCategoriaService,
           eliminarCategoriaService } from "../services/categorias.services.js";
 
-
+//en los controlleers no debo devolver errores
 
 export const obtenerCategoriasController = async(req, res) => {
     const categorias = await obtenerCategoriasService();

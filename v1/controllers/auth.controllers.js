@@ -1,7 +1,7 @@
 import {registrarUsuarioService, loginUsuarioService} from "../services/auth.services.js";
 
 export const registrarUsuario = async (req, res) => {
-     console.log("ENTRO A registrarUsuario");
+     console.log("BODY:", req.body);
     const { usuario, token } = await registrarUsuarioService(req.body);
     res.json({ message: "Usuario registrado", usuario, token });
 }
