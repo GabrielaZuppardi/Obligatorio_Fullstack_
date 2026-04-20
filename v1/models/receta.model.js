@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+//imports no utilizado pero recomendado
+import usuario from "./usuario.model.js";
+import categoria from "./categoria.model.js";
 
 const recipeSchema = new mongoose.Schema(
   {
@@ -18,7 +21,7 @@ const recipeSchema = new mongoose.Schema(
       required: true
     },
     pasos: {
-      type: [String],
+      type: [String],  
       required: true
     },
     tiempoPreparacion: {
@@ -41,7 +44,16 @@ const recipeSchema = new mongoose.Schema(
       type: String
     },
 
-    //falta asociarlo con CATEGORIA y USUARIO, pero eso lo haré después
+    usuario: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Usuario",
+      required: true
+    },
+    categoria: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Categoria",
+      required: true
+    }
   },
   {
     timestamps: true
