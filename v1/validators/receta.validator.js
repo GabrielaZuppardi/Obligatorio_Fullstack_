@@ -81,7 +81,26 @@ export const crearRecetaSchema = Joi.object({
     .optional()
     .messages({
       "string.uri": "La URL de la imagen debe ser válida"
-    })
+    }),
+    usuario: Joi.string()
+    .hex()
+    .length(24)
+    .required()
+    .messages({
+    "string.hex": "El usuario debe ser un ObjectId válido",
+    "string.length": "El usuario debe tener 24 caracteres",
+    "any.required": "El usuario es obligatorio"
+  }),
+
+  categoria: Joi.string()
+  .hex()
+  .length(24)
+  .required()
+  .messages({
+    "string.hex": "La categoría debe ser un ObjectId válido",
+    "string.length": "La categoría debe tener 24 caracteres",
+    "any.required": "La categoría es obligatoria"
+  })
 });
 
 // Esquema de validación para actualizar una receta (todos los campos opcionales)
@@ -151,7 +170,16 @@ export const modificarRecetaSchema = Joi.object({
     .uri()
     .messages({
       "string.uri": "La URL de la imagen debe ser válida"
-    })
+    }),
+     usuario: Joi.string()
+    .hex()
+    .length(24)
+    .optional(),
+
+  categoria: Joi.string()
+    .hex()
+    .length(24)
+    .optional()
 }).min(1).messages({
   "object.min": "Debes enviar al menos un campo para modificar"
 });

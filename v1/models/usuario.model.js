@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import receta from "./receta.model.js";
 
 const usuarioSchema = new mongoose.Schema({
     nombre: {
@@ -26,7 +27,9 @@ const usuarioSchema = new mongoose.Schema({
         type: String,
         enum: ["plus", "premium"],
         default: "plus"
-    }
+    },
+   
+  
 },
 /* {
     timestamps: true
@@ -34,4 +37,4 @@ const usuarioSchema = new mongoose.Schema({
 
 );
 
-export default mongoose.model("Usuario", usuarioSchema);
+export default mongoose.model("Usuario", usuarioSchema); 

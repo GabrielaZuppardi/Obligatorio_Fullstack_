@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import v1Router from "./v1/index.js"; // Importar rutas de la versión 1    
+import v1Router from "./v1/index.js"; // Importar rutas de la versión 1   
 import { notFoundMiddleware } from './v1/middlewares/notFound.middleware.js';
+import { errorMiddleware } from './v1/middlewares/error.middleware.js'; 
 import connectDB from './v1/config/db.config.js'; // Importar función para conectar a la base de datos 
+
 
 dotenv.config();
 
@@ -27,5 +29,7 @@ app.get('/', (req, res) => {
 
 app.use('/v1', v1Router); // Usar las rutas de la versión 1
 app.use(notFoundMiddleware); // Middleware para manejar rutas no encontradas
+
+app.use(errorMiddleware); // Middleware para manejar errores
 
 export default app;

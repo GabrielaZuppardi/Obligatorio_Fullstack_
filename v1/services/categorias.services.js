@@ -1,5 +1,6 @@
  //importo el modelo correspondiente a Categoria
- import Categoria from '../models/categoria.model.js';
+ import { isValidObjectId } from 'mongoose';
+import Categoria from '../models/categoria.model.js';
  
  export const obtenerCategoriasService = async () => {
     const categorias = await Categoria.find();
@@ -7,10 +8,24 @@
 }
 
 export const obtenerCategoriaPorIdService = async (id) => {
-    const categoria = await Categoria.findById(id);
-    return categoria;
-}
+    //La validación del id inválido tiene que hacerse antes de consultar la base.
+    if (!isValidObjectId(id)) {
+        const errorId = new Error("El id no es válido");
+        errorId.status = 400;
+        throw errorId;
+    }
 
+    const categoria = await Categoria.findById(id);
+
+    if (!categoria) {
+        const errorId = new Error("No se encontró la categoría con el id proporcionado");
+        errorId.status = 404;
+        errorId.details = { id };
+        throw errorId;
+    }
+
+    return categoria;
+};
  export const crearCategoriasService = async (categoria) => {
     let nuevaCategoria = new Categoria(categoria);
     await nuevaCategoria.save();
