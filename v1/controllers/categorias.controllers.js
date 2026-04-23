@@ -7,8 +7,9 @@
 //en los controlleers no debo devolver errores
 
 export const obtenerCategoriasController = async(req, res) => {
-    const categorias = await obtenerCategoriasService();
-    res.json({ mensaje: "Obtener todas las categorías", categorias });
+    const { page, limit } = req.query;
+    const categorias = await obtenerCategoriasService(page, limit);
+    res.status(200).json({ mensaje: "Obtener todas las categorías", categorias });
 }   
 
 export const obtenerCategoriaPorIdController = async (req, res) => {

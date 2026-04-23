@@ -3,7 +3,8 @@ import {obtenerRecetasService,
         crearRecetaService, 
         actualizarRecetaService, 
         eliminarRecetaService,
-        obtenerMisRecetasService} from "../services/recetas.services.js";
+        obtenerMisRecetasService,
+        buscarRecetasExternasService} from "../services/recetas.services.js";
 
  export const obtenerMisRecetasController = async (req, res) => {
     const{page, limit} = req.query;
@@ -41,3 +42,25 @@ export const eliminarRecetaController = async(req, res) => {
     const recetaEliminada = await eliminarRecetaService(id);
     res.json({ mensaje: `Receta eliminada`, receta: recetaEliminada });
 }   
+
+export const buscarRecetasExternasController = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ mensaje: "La query es obligatoria" });
+    }
+
+    const resultado = await buscarRecetasExternasService(query);
+
+    res.status(200).json({
+      mensaje: "Recetas externas obtenidas correctamente",
+      ...resultado
+    });
+
+  } catch (error) {
+    res.status(error.status || 500).json({
+      mensaje: error.message || "Error interno"
+    });
+  }
+};

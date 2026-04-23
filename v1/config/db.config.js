@@ -38,15 +38,21 @@ const connectDB = async () => {
 
 const connectDB = async () => {
   try {
-    const uri = process.env.MONGO_URI_ATLAS || process.env.MONGO_URI; //primero intenta conectar a Atlas, si no está disponible, conecta a local
+    const uri =
+      process.env.NODE_ENV === "production"
+        ? process.env.MONGO_URI_ATLAS
+        : process.env.MONGO_URI;
+
     console.log("Conectando a:", uri);
+
     await mongoose.connect(uri);
 
     console.log("Conectado a MongoDB");
   } catch (error) {
     console.error("Error al conectar a MongoDB:", error);
     process.exit(1);
-  } 
+  }
 };
 
 export default connectDB;
+

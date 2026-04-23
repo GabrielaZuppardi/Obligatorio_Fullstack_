@@ -1,5 +1,6 @@
 //importo el modelo correspondiente a Receta
 import Receta from '../models/receta.model.js';
+import axios from "axios";
 
 export const obtenerMisRecetasService = async (usuarioId, page, limit) => {
     limit=Number(limit) || 3; //si no se envía un límite, se establece en 10 por defecto
@@ -54,3 +55,17 @@ export const eliminarRecetaService = async (id) => {
    const recetaEliminada = await Receta.findByIdAndDelete(id);
     return recetaEliminada;
 }
+
+export const buscarRecetasExternasService = async (query) => {
+  const response = await axios.get(
+    "https://api.spoonacular.com/recipes/complexSearch",
+    {
+      params: {
+        query,
+        apiKey: process.env.SPOONACULAR_API_KEY
+      }
+    }
+  );
+
+  return response.data;
+};

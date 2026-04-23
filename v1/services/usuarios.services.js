@@ -1,8 +1,15 @@
 import Usuario from '../models/usuario.model.js';
 
-export const obtenerUsuariosService = async () => {
-    const usuarios = await Usuario.find();
-    return usuarios;
+export const obtenerUsuariosService = async (page, limit) => {
+    limit=Number(limit) || 3;
+    page=Number(page) || 1;
+    const skip = (page - 1) * limit;
+    const totalUsuarios = await Usuario.countDocuments();
+    const totalPages = Math.ceil(totalUsuarios / limit);
+    const usuarios = await Usuario.find()
+        .skip(skip)
+        .limit(limit);
+    return { usuarios, totalPages, page, limit };
 }
 
 export const obtenerUsuarioPorIdService = async (id) => {
