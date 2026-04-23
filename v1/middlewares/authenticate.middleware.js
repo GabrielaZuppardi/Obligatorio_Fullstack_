@@ -10,7 +10,7 @@ export const authenticateMiddleware = (req, res, next) => {
 
     jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
         if (err) return res.status(403).json({ mensaje: "Token inválido" });
-        req.user = user;
+        req.usuario = user;
         next(); 
    });
 }

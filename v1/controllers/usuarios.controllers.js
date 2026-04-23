@@ -20,11 +20,13 @@ export const crearUsuarioController = async (req, res) => {
        res.json({ mensaje: `Usuario creado`, usuario: usuarioCreado });
 }
 
+
 export const actualizarUsuarioController = async (req, res) => {
+
     const { id } = req.params;
-    const usuarioActualizado = await actualizarUsuarioService(id, req.body);
-    res.json({ mensaje: `Usuario actualizado`, usuario: usuarioActualizado });
-}
+      const usuarioActualizado = await actualizarUsuarioService(id, req.body);
+    res.json({ mensaje: "Usuario actualizado", usuario: usuarioActualizado });
+};
 
 export const eliminarUsuarioController = async(req, res) => {
     const { id } = req.params;

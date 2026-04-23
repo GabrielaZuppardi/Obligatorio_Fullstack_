@@ -3,8 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const registrarUsuarioService = async (usuario) => {
-    const passwordHash = bcrypt.hashSync(usuario.password, Number(process.env.SALT_ROUNDS));
-    const nuevoUsuario = new Usuario({ ...usuario, password: passwordHash });
+   /*const passwordHash = bcrypt.hashSync(usuario.password, Number(process.env.SALT_ROUNDS));
+    const nuevoUsuario = new Usuario({ ...usuario, password: passwordHash });*/
+    const nuevoUsuario = new Usuario(usuario);
     await nuevoUsuario.save();
     const token = jwt.sign({ id: nuevoUsuario._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
     //evitar enviar el usuario, solo prueba

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-//imports no utilizado pero recomendado
+//imports de modelos con los que se vincula el modelo receta, no utilizado pero recomendado
 import usuario from "./usuario.model.js";
 import categoria from "./categoria.model.js";
 
@@ -60,4 +60,4 @@ const recipeSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model('Receta', recipeSchema);
+export default mongoose.model('Receta', recipeSchema); //como tercer parámetro puedo porner el nombre explicito de la colección, si no se pone, mongoose lo toma del nombre del modelo y lo pluraliza, en este caso sería "recetas".

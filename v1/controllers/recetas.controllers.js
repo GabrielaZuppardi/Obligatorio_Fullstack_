@@ -2,11 +2,21 @@ import {obtenerRecetasService,
         obtenerRecetaPorIdService, 
         crearRecetaService, 
         actualizarRecetaService, 
-        eliminarRecetaService} from "../services/recetas.services.js";
+        eliminarRecetaService,
+        obtenerMisRecetasService} from "../services/recetas.services.js";
 
+ export const obtenerMisRecetasController = async (req, res) => {
+    const{page, limit} = req.query;
+    const usuarioId = req.usuario.id;
+    const respuesta = await obtenerMisRecetasService(usuarioId, page, limit);
+    console.log(req.usuario);
+    res.status(200).json({ mensaje: "Recetas del usuario", ...respuesta });
+}
+        
 export const obtenerRecetasController = async(req, res) => {
-    const recetas = await obtenerRecetasService();
-    res.json({ mensaje: "Obtener todas las recetas", recetas });
+     const{page, limit} = req.query;
+    const recetas = await obtenerRecetasService(page, limit);
+    res.status(200).json({ mensaje: "Obtener todas las recetas", recetas });
 }
 
 export const obtenerRecetaPorIdController = async (req, res) => {
