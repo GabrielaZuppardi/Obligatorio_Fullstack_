@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import receta from "./receta.model.js";
 
 const usuarioSchema = new mongoose.Schema({
@@ -36,5 +37,12 @@ const usuarioSchema = new mongoose.Schema({
 }*/ //sugerencia del chat: timestamps → agrega createdAt y updatedAt automáticamente
 
 );
+
+usuarioSchema.pre("save", function () {
+    if (!this.isModified("password")) return;
+
+    const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
+    this.password = bcrypt.hashSync(this.password, salt);
+});
 
 export default mongoose.model("Usuario", usuarioSchema); 

@@ -2,11 +2,22 @@ import {obtenerRecetasService,
         obtenerRecetaPorIdService, 
         crearRecetaService, 
         actualizarRecetaService, 
-        eliminarRecetaService} from "../services/recetas.services.js";
+        eliminarRecetaService,
+        obtenerMisRecetasService,
+        buscarRecetasExternasService} from "../services/recetas.services.js";
 
+ export const obtenerMisRecetasController = async (req, res) => {
+    const{page, limit} = req.query;
+    const usuarioId = req.usuario.id;
+    const respuesta = await obtenerMisRecetasService(usuarioId, page, limit);
+    console.log(req.usuario);
+    res.status(200).json({ mensaje: "Recetas del usuario", ...respuesta });
+}
+        
 export const obtenerRecetasController = async(req, res) => {
-    const recetas = await obtenerRecetasService();
-    res.json({ mensaje: "Obtener todas las recetas", recetas });
+     const{page, limit} = req.query;
+    const recetas = await obtenerRecetasService(page, limit);
+    res.status(200).json({ mensaje: "Obtener todas las recetas", recetas });
 }
 
 export const obtenerRecetaPorIdController = async (req, res) => {
@@ -31,3 +42,25 @@ export const eliminarRecetaController = async(req, res) => {
     const recetaEliminada = await eliminarRecetaService(id);
     res.json({ mensaje: `Receta eliminada`, receta: recetaEliminada });
 }   
+
+export const buscarRecetasExternasController = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ mensaje: "La query es obligatoria" });
+    }
+
+    const resultado = await buscarRecetasExternasService(query);
+
+    res.status(200).json({
+      mensaje: "Recetas externas obtenidas correctamente",
+      ...resultado
+    });
+
+  } catch (error) {
+    res.status(error.status || 500).json({
+      mensaje: error.message || "Error interno"
+    });
+  }
+};
