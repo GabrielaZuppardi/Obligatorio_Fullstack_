@@ -68,7 +68,7 @@ const connectDB = async () => {
       process.env.NODE_ENV === "production"
         ? process.env.MONGO_URI_ATLAS
         : process.env.MONGO_URI;
-
+console.log("URI:", uri);
     console.log("NODE_ENV:", process.env.NODE_ENV);
     console.log("Conectando a MongoDB...");
 
