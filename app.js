@@ -26,6 +26,14 @@ app.get('/', (req, res) => {
   res.send('Respuesta del servidor a la raiz!');
 }); // Ruta de ejemplo para probar el servidor. Endpont para probar si mi servidor responde a la raíz.
 
+app.get("/health", (req, res) => {
+  res.json({
+    ok: true,
+    nodeEnv: process.env.NODE_ENV,
+    mongoUri: process.env.MONGO_URI_ATLAS ? "existe" : "no existe"
+  });
+});
+
 app.use('/v1', v1Router); // Usar las rutas de la versión 1
 app.use(notFoundMiddleware); // Middleware para manejar rutas no encontradas
 
