@@ -4,7 +4,8 @@ import {obtenerRecetasService,
         actualizarRecetaService, 
         eliminarRecetaService,
         obtenerMisRecetasService,
-        buscarRecetasExternasService} from "../services/recetas.services.js";
+        buscarRecetasExternasService,
+        generarRecetaService} from "../services/recetas.services.js";
 
  export const obtenerMisRecetasController = async (req, res) => {
     const{page, limit} = req.query;
@@ -63,4 +64,47 @@ export const buscarRecetasExternasController = async (req, res) => {
       mensaje: error.message || "Error interno"
     });
   }
+}
+ export const generarRecetaController = async (req, res) => {
+    console.log("Entró al controller de generar receta IA");
+    console.log("Body recibido:", req.body);
+    try {
+        const { ingredientes, dificultad, tiempoMaximo } = req.body;
+
+        const receta = await generarRecetaService({
+            ingredientes,
+            dificultad,
+            tiempoMaximo
+        });
+
+        res.json({
+            message: "Receta generada",
+            receta
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        // 🔥 fallback obligatorio
+        res.status(200).json({
+            message: "IA no disponible, usando fallback",
+            fallback: true,
+            receta: {
+                titulo: "Receta sugerida manual",
+                descripcion: "Podés crear una receta con los ingredientes proporcionados.",
+                ingredientes: req.body.ingredientes || [],
+                pasos: [
+                    "Seleccionar ingredientes",
+                    "Definir método de cocción",
+                    "Preparar y cocinar",
+                    "Servir"
+                ],
+                tiempoPreparacion: req.body.tiempoMaximo || 30,
+                dificultad: req.body.dificultad || "media",
+                porciones: 2
+            }
+        });
+    }
 };
+
+

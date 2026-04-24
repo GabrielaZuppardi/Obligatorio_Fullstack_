@@ -69,3 +69,61 @@ export const buscarRecetasExternasService = async (query) => {
 
   return response.data;
 };
+
+export const generarRecetaService = async ({ ingredientes, dificultad, tiempoMaximo }) => {
+    console.log("ESTE ES MI SERVER LOCAL");
+
+    const API_KEY = process.env.GEMINI_25_API_KEY;
+    const MODEL = 'gemini-2.5-flash';
+    const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': API_KEY
+    };
+
+    const prompt = `
+Generá una receta en formato JSON.
+
+Ingredientes: ${ingredientes.join(", ")}
+Dificultad: ${dificultad}
+Tiempo máximo: ${tiempoMaximo} minutos
+
+Respondé SOLO en JSON con:
+{
+  "titulo": "",
+  "descripcion": "",
+  "ingredientes": [],
+  "pasos": [],
+  "tiempoPreparacion": number,
+  "dificultad": "",
+  "porciones": number
+}
+`;
+
+    const body = {
+        contents: [
+            { parts: [{ text: prompt }] }
+        ]
+    };
+
+    const response = await axios.post(ENDPOINT, body, { headers });
+
+    const textoIA = response.data.candidates[0].content.parts[0].text;
+
+    // opcional: intentar parsear
+    try {
+        const textoLimpio = textoIA
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
+
+        return JSON.parse(textoLimpio);
+    } catch (error) {
+
+        // 🔥 ESTE ES EL LOG IMPORTANTE
+        console.log("ERROR IA:", error.response?.data || error.message);
+
+        throw error; // esto hace que el controller active el fallback
+    }
+};
