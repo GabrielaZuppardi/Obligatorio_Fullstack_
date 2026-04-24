@@ -5,11 +5,10 @@ import v1Router from "./v1/index.js"; // Importar rutas de la versión 1
 import { notFoundMiddleware } from './v1/middlewares/notFound.middleware.js';
 import { errorMiddleware } from './v1/middlewares/error.middleware.js'; 
 
-
-
 dotenv.config();
 
 const app = express();
+
 
 
 app.use(cors(/*{
