@@ -16,7 +16,7 @@ export const obtenerMisRecetasService = async (usuarioId, page, limit) => {
         console.log("limit:", limit);
         console.log("skip:", skip);*/
 
-    return { recetas, totalPages, page, limit };
+    return { recetas, totalRecetas, totalPages, page, limit };
 }
 
 export const obtenerRecetasService = async (page, limit) => {
@@ -32,29 +32,174 @@ export const obtenerRecetasService = async (page, limit) => {
         .skip(skip) //saltea las primeras 2 recetas
         .limit(limit);//limita el resultado a 3 recetas 
 
-    return { recetas, totalPages, page, limit };
+    return { recetas, totalRecetas, totalPages, page, limit };
 }
 
 export const obtenerRecetaPorIdService = async (id) => {
-    const receta = await Receta.findById(id);
+
+    // 🔹 Validar id
+    if (!isValidObjectId(id)) {
+        const error = new Error("El id no es válido");
+        error.status = 400;
+        throw error;
+    }
+
+    const receta = await Receta.findById(id)
+        .populate("usuario", "nombre")
+        .populate("categoria", "nombre");
+
+    // 🔹 Validar existencia
+    if (!receta) {
+        const error = new Error("No se encontró la receta");
+        error.status = 404;
+        error.details = { id };
+        throw error;
+    }
+
     return receta;
-}   
+}; 
 
 export const crearRecetaService = async (receta) => {
-    let nuevaReceta = new Receta(receta);
-    await nuevaReceta.save();
-    return nuevaReceta;
-}   
 
-export const actualizarRecetaService = async (id, receta) => {
-    const recetaActualizada = await Receta.findByIdAndUpdate(id, receta, { returnDocument: "after" });
+    const { usuario, categoria, titulo } = receta;
+
+    if (!isValidObjectId(usuario)) {
+        const error = new Error("El id del usuario no es válido");
+        error.status = 400;
+        throw error;
+    }
+
+    if (!isValidObjectId(categoria)) {
+        const error = new Error("El id de la categoría no es válido");
+        error.status = 400;
+        throw error;
+    }
+
+    const usuarioExiste = await Usuario.findById(usuario);
+
+    if (!usuarioExiste) {
+        const error = new Error("No se encontró el usuario");
+        error.status = 404;
+        throw error;
+    }
+
+    const categoriaExiste = await Categoria.findById(categoria);
+
+    if (!categoriaExiste) {
+        const error = new Error("No se encontró la categoría");
+        error.status = 404;
+        throw error;
+    }
+
+    const recetaExistente = await Receta.findOne({
+        titulo: titulo.trim().toLowerCase(),
+        usuario
+    });
+
+    if (recetaExistente) {
+        const error = new Error("Ya existe una receta con ese título para este usuario");
+        error.status = 409;
+        throw error;
+    }
+
+    const nuevaReceta = new Receta({
+        ...receta,
+        titulo: titulo.trim()
+    });
+
+    await nuevaReceta.save();
+
+    return nuevaReceta;
+};  
+
+export const actualizarRecetaService = async (id, receta, usuarioId) => {
+    if (!isValidObjectId(id)) {
+        const error = new Error("El id no es válido");
+        error.status = 400;
+        throw error;
+    }
+
+    const recetaExistente = await Receta.findById(id);
+
+    if (!recetaExistente) {
+        const error = new Error("No se encontró la receta");
+        error.status = 404;
+        throw error;
+    }
+
+    if (!recetaExistente.usuario.equals(usuarioId)) {
+        const error = new Error("No tenés permiso para modificar esta receta");
+        error.status = 403;
+        throw error;
+    }
+
+    const { categoria, titulo } = receta;
+
+    const datosActualizados = { ...receta };
+
+    if (categoria) {
+        if (!isValidObjectId(categoria)) {
+            const error = new Error("El id de la categoría no es válido");
+            error.status = 400;
+            throw error;
+        }
+
+        const categoriaExiste = await Categoria.findById(categoria);
+
+        if (!categoriaExiste) {
+            const error = new Error("No se encontró la categoría");
+            error.status = 404;
+            throw error;
+        }
+    }
+
+    if (titulo) {
+        const recetaDuplicada = await Receta.findOne({
+            titulo: titulo.trim().toLowerCase(),
+            usuario: usuarioId,
+            _id: { $ne: id }
+        });
+
+        if (recetaDuplicada) {
+            const error = new Error("Ya existe una receta con ese título para este usuario");
+            error.status = 409;
+            throw error;
+        }
+
+        datosActualizados.titulo = titulo.trim();
+    }
+
+    delete datosActualizados.usuario;
+
+    const recetaActualizada = await Receta.findByIdAndUpdate(
+        id,
+        datosActualizados,
+        { returnDocument: "after" }
+    );
+
     return recetaActualizada;
-}
+};
 
 export const eliminarRecetaService = async (id) => {
-   const recetaEliminada = await Receta.findByIdAndDelete(id);
+
+    // Validar id
+    if (!isValidObjectId(id)) {
+        const error = new Error("El id no es válido");
+        error.status = 400;
+        throw error;
+    }
+
+    const recetaEliminada = await Receta.findByIdAndDelete(id);
+
+    // Validar existencia
+    if (!recetaEliminada) {
+        const error = new Error("No se encontró la receta");
+        error.status = 404;
+        throw error;
+    }
+
     return recetaEliminada;
-}
+};
 
 export const buscarRecetasExternasService = async (query) => {
   const response = await axios.get(

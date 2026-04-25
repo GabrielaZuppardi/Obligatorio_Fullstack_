@@ -7,49 +7,109 @@ import {obtenerRecetasService,
         buscarRecetasExternasService,
         generarRecetaService} from "../services/recetas.services.js";
 
- export const obtenerMisRecetasController = async (req, res) => {
-    const{page, limit} = req.query;
-    const usuarioId = req.usuario.id;
-    const respuesta = await obtenerMisRecetasService(usuarioId, page, limit);
-    console.log(req.usuario);
-    res.status(200).json({ mensaje: "Recetas del usuario", ...respuesta });
-}
+ export const obtenerMisRecetasController = async (req, res, next) => {
+    try {
+        const { page, limit } = req.query;
+        const usuarioId = req.usuario.id;
+
+        const respuesta = await obtenerMisRecetasService(usuarioId, page, limit);
+
+        res.status(200).json({
+            mensaje: "Recetas del usuario obtenidas correctamente",
+            ...respuesta
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
         
-export const obtenerRecetasController = async(req, res) => {
-     const{page, limit} = req.query;
-    const recetas = await obtenerRecetasService(page, limit);
-    res.status(200).json({ mensaje: "Obtener todas las recetas", recetas });
-}
+export const obtenerRecetasController = async (req, res, next) => {
+    try {
+        const { page, limit } = req.query;
 
-export const obtenerRecetaPorIdController = async (req, res) => {
-    const { id } = req.params;
-    const receta = await obtenerRecetaPorIdService(id);
-    res.json({ mensaje: receta });
-}   
+        const respuesta = await obtenerRecetasService(page, limit);
 
-export const crearRecetaController = async (req, res) => {
-   const recetaCreada = await crearRecetaService(req.body);
-       res.json({ mensaje: `Receta creada`, receta: recetaCreada });
-}
+        res.status(200).json({
+            mensaje: "Recetas obtenidas correctamente",
+            ...respuesta
+        });
 
-export const actualizarRecetaController = async (req, res) => {
-    const { id } = req.params;
-    const recetaActualizada = await actualizarRecetaService(id, req.body);
-    res.json({ mensaje: `Receta actualizada`, receta: recetaActualizada });
-}
+    } catch (error) {
+        next(error);
+    }
+};
 
-export const eliminarRecetaController = async(req, res) => {
-    const { id } = req.params;
-    const recetaEliminada = await eliminarRecetaService(id);
-    res.json({ mensaje: `Receta eliminada`, receta: recetaEliminada });
-}   
+export const obtenerRecetaPorIdController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
 
-export const buscarRecetasExternasController = async (req, res) => {
+        const receta = await obtenerRecetaPorIdService(id);
+
+        res.status(200).json({
+            mensaje: "Receta obtenida correctamente",
+            receta
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}; 
+
+export const crearRecetaController = async (req, res, next) => {
+    try {
+        const recetaCreada = await crearRecetaService(req.body);
+
+        res.status(201).json({
+            mensaje: "Receta creada correctamente",
+            receta: recetaCreada
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const actualizarRecetaController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const recetaActualizada = await actualizarRecetaService(id, req.body);
+
+        res.status(200).json({
+            mensaje: "Receta actualizada correctamente",
+            receta: recetaActualizada
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const eliminarRecetaController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const recetaEliminada = await eliminarRecetaService(id);
+
+        res.status(200).json({
+            mensaje: "Receta eliminada correctamente",
+            receta: recetaEliminada
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const buscarRecetasExternasController = async (req, res, next) => {
   try {
     const { query } = req.query;
 
     if (!query) {
-      return res.status(400).json({ mensaje: "La query es obligatoria" });
+      const error = new Error("La query es obligatoria");
+      error.status = 400;
+      throw error;
     }
 
     const resultado = await buscarRecetasExternasService(query);
@@ -60,14 +120,11 @@ export const buscarRecetasExternasController = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(error.status || 500).json({
-      mensaje: error.message || "Error interno"
-    });
+    next(error);
   }
-}
+};
+
  export const generarRecetaController = async (req, res) => {
-    console.log("Entró al controller de generar receta IA");
-    console.log("Body recibido:", req.body);
     try {
         const { ingredientes, dificultad, tiempoMaximo } = req.body;
 
@@ -77,17 +134,16 @@ export const buscarRecetasExternasController = async (req, res) => {
             tiempoMaximo
         });
 
-        res.json({
-            message: "Receta generada",
+        res.status(200).json({
+            mensaje: "Receta generada con IA",
             receta
         });
 
     } catch (error) {
-        console.error(error);
 
-        // 🔥 fallback obligatorio
+        // fallback en caso de error en el servicio de IA
         res.status(200).json({
-            message: "IA no disponible, usando fallback",
+            mensaje: "Servicio de IA no disponible. Se devuelve una sugerencia alternativa.",
             fallback: true,
             receta: {
                 titulo: "Receta sugerida manual",
@@ -106,5 +162,4 @@ export const buscarRecetasExternasController = async (req, res) => {
         });
     }
 };
-
 
