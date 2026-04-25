@@ -1,3 +1,4 @@
+import usuarioModel from "../models/usuario.model.js";
 import {obtenerRecetasService, 
         obtenerRecetaPorIdService, 
         crearRecetaService, 
@@ -55,10 +56,11 @@ export const obtenerRecetaPorIdController = async (req, res, next) => {
         next(error);
     }
 }; 
-
 export const crearRecetaController = async (req, res, next) => {
     try {
-        const recetaCreada = await crearRecetaService(req.body);
+        const usuarioId = req.usuario.id; // 👈 esto faltaba
+
+        const recetaCreada = await crearRecetaService(req.body, usuarioId);
 
         res.status(201).json({
             mensaje: "Receta creada correctamente",
@@ -69,7 +71,6 @@ export const crearRecetaController = async (req, res, next) => {
         next(error);
     }
 };
-
 export const actualizarRecetaController = async (req, res, next) => {
     try {
         const { id } = req.params;

@@ -85,7 +85,6 @@ export const crearRecetaSchema = Joi.object({
     usuario: Joi.string()
     .hex()
     .length(24)
-    .required()
     .messages({
     "string.hex": "El usuario debe ser un ObjectId válido",
     "string.length": "El usuario debe tener 24 caracteres",

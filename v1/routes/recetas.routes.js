@@ -21,7 +21,7 @@ router.get("/", obtenerRecetasController);
 router.get("/:id", obtenerRecetaPorIdController);
 
 
-router.post("/",validateBody(crearRecetaSchema), crearRecetaController);
+router.post("/",authenticateMiddleware,validateBody(crearRecetaSchema), crearRecetaController);
 router.patch("/:id", validateBody(modificarRecetaSchema), actualizarRecetaController);
 router.delete("/:id", eliminarRecetaController);
 

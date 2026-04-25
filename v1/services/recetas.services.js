@@ -1,6 +1,9 @@
 //importo el modelo correspondiente a Receta
 import Receta from '../models/receta.model.js';
 import axios from "axios";
+import { isValidObjectId } from 'mongoose';
+import Usuario from '../models/usuario.model.js';
+import Categoria from '../models/categoria.model.js';
 
 export const obtenerMisRecetasService = async (usuarioId, page, limit) => {
     limit=Number(limit) || 3; //si no se envía un límite, se establece en 10 por defecto
@@ -59,11 +62,11 @@ export const obtenerRecetaPorIdService = async (id) => {
     return receta;
 }; 
 
-export const crearRecetaService = async (receta) => {
+export const crearRecetaService = async (receta, usuarioId) => {
 
-    const { usuario, categoria, titulo } = receta;
+    const { categoria, titulo } = receta;
 
-    if (!isValidObjectId(usuario)) {
+    if (!isValidObjectId(usuarioId)) {
         const error = new Error("El id del usuario no es válido");
         error.status = 400;
         throw error;
@@ -75,7 +78,7 @@ export const crearRecetaService = async (receta) => {
         throw error;
     }
 
-    const usuarioExiste = await Usuario.findById(usuario);
+    const usuarioExiste = await Usuario.findById(usuarioId);
 
     if (!usuarioExiste) {
         const error = new Error("No se encontró el usuario");
@@ -92,8 +95,8 @@ export const crearRecetaService = async (receta) => {
     }
 
     const recetaExistente = await Receta.findOne({
-        titulo: titulo.trim().toLowerCase(),
-        usuario
+        titulo: titulo.trim(),
+        usuario: usuarioId
     });
 
     if (recetaExistente) {
@@ -104,13 +107,14 @@ export const crearRecetaService = async (receta) => {
 
     const nuevaReceta = new Receta({
         ...receta,
-        titulo: titulo.trim()
+        titulo: titulo.trim(),
+        usuario: usuarioId
     });
 
     await nuevaReceta.save();
 
     return nuevaReceta;
-};  
+};
 
 export const actualizarRecetaService = async (id, receta, usuarioId) => {
     if (!isValidObjectId(id)) {

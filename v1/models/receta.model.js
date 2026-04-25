@@ -47,7 +47,7 @@ const recipeSchema = new mongoose.Schema(
     usuario: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Usuario",
-      required: true
+  //no lo ponemos requerido porque lo agrega el backend al crear la receta, no lo envía el cliente, pero es importante que esté para mantener la relación entre receta y usuario.
     },
     categoria: {
       type: mongoose.Schema.Types.ObjectId,
