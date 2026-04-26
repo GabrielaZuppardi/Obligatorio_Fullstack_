@@ -153,30 +153,28 @@ export const buscarRecetasExternasController = async (req, res, next) => {
   }
 };
 
-export const generarDescripcionRecetaController = async (req, res) => {
+export const generarDescripcionRecetaController = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const usuarioId = req.usuario.id;
 
     const receta = await obtenerRecetaPorIdService(id);
 
-    if (!receta) {
-      return res.status(404).json({
-        mensaje: "Receta no encontrada"
-      });
-    }
-
-    // 👉 ahora delegás
     const descripcionGenerada = await generarDescripcionRecetaService(receta);
 
     if (!descripcionGenerada) {
-      return res.status(200).json({
+      return res.status(503).json({
         mensaje: "No se pudo generar la descripción con IA. La receta no fue modificada."
       });
     }
 
-    const recetaActualizada = await actualizarRecetaService(id, {
-      description: descripcionGenerada
-    });
+    const recetaActualizada = await actualizarRecetaService(
+      id,
+      {
+        descripcion: descripcionGenerada
+      },
+      usuarioId
+    );
 
     return res.status(200).json({
       mensaje: "Descripción generada y guardada correctamente",
@@ -184,47 +182,52 @@ export const generarDescripcionRecetaController = async (req, res) => {
     });
 
   } catch (error) {
-    return res.status(500).json({
-      mensaje: "Error interno"
-    });
+    next(error);
   }
 };
+
  export const generarRecetaController = async (req, res) => {
-    try {
-        const { ingredientes, dificultad, tiempoMaximo } = req.body;
+  try {
+    const { ingredientes, dificultad, tiempoMaximo } = req.body;
 
-        const receta = await generarRecetaService({
-            ingredientes,
-            dificultad,
-            tiempoMaximo
-        });
+    const receta = await generarRecetaService({
+      ingredientes,
+      dificultad,
+      tiempoMaximo
+    });
 
-        res.status(200).json({
-            mensaje: "Receta generada con IA",
-            receta
-        });
-
-    } catch (error) {
-
-        // fallback en caso de error en el servicio de IA
-        res.status(200).json({
-            mensaje: "Servicio de IA no disponible. Se devuelve una sugerencia alternativa.",
-            fallback: true,
-            receta: {
-                titulo: "Receta sugerida manual",
-                descripcion: "Podés crear una receta con los ingredientes proporcionados.",
-                ingredientes: req.body.ingredientes || [],
-                pasos: [
-                    "Seleccionar ingredientes",
-                    "Definir método de cocción",
-                    "Preparar y cocinar",
-                    "Servir"
-                ],
-                tiempoPreparacion: req.body.tiempoMaximo || 30,
-                dificultad: req.body.dificultad || "media",
-                porciones: 2
-            }
-        });
+    // fallback: si falla IA, no tirar error, sino devolver una receta genérica con los datos proporcionados
+    if (!receta) {
+      return res.status(503).json({
+        mensaje: "Servicio de IA no disponible. Se devuelve una sugerencia alternativa.",
+        fallback: true,
+        receta: {
+          titulo: "Receta sugerida manual",
+          descripcion: "Podés crear una receta con los ingredientes proporcionados.",
+          ingredientes: req.body.ingredientes || [],
+          pasos: [
+            "Seleccionar ingredientes",
+            "Definir método de cocción",
+            "Preparar y cocinar",
+            "Servir"
+          ],
+          tiempoPreparacion: req.body.tiempoMaximo || 30,
+          dificultad: req.body.dificultad || "media",
+          porciones: 2
+        }
+      });
     }
+
+    // ✅ SOLO SI FUNCIONA IA
+    return res.status(200).json({
+      mensaje: "Receta generada con IA",
+      receta
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      mensaje: "Error inesperado al generar la receta"
+    });
+  }
 };
 
