@@ -128,19 +128,13 @@ export const buscarRecetasExternasController = async (req, res, next) => {
   }
 };
 
-export const generarDescripcionRecetaController = async (req, res) => {
+export const generarDescripcionRecetaController = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const usuarioId = req.usuario.id;
 
     const receta = await obtenerRecetaPorIdService(id);
 
-    if (!receta) {
-      return res.status(404).json({
-        mensaje: "Receta no encontrada"
-      });
-    }
-
-    // 👉 ahora delegás
     const descripcionGenerada = await generarDescripcionRecetaService(receta);
 
     if (!descripcionGenerada) {
@@ -149,9 +143,13 @@ export const generarDescripcionRecetaController = async (req, res) => {
       });
     }
 
-    const recetaActualizada = await actualizarRecetaService(id, {
-      description: descripcionGenerada
-    });
+    const recetaActualizada = await actualizarRecetaService(
+      id,
+      {
+        descripcion: descripcionGenerada
+      },
+      usuarioId
+    );
 
     return res.status(200).json({
       mensaje: "Descripción generada y guardada correctamente",
@@ -159,11 +157,10 @@ export const generarDescripcionRecetaController = async (req, res) => {
     });
 
   } catch (error) {
-    return res.status(500).json({
-      mensaje: "Error interno"
-    });
+    next(error);
   }
 };
+
  export const generarRecetaController = async (req, res) => {
     try {
         const { ingredientes, dificultad, tiempoMaximo } = req.body;
