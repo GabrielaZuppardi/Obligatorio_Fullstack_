@@ -69,3 +69,43 @@ export const buscarRecetasExternasService = async (query) => {
 
   return response.data;
 };
+
+export const generarDescripcionRecetaService = async (receta) => {
+  const prompt = `
+  Generá una descripción breve (máximo 2 líneas) para esta receta:
+
+  Título: ${receta.titulo}
+  Categoría: ${receta.categoria?.nombre}
+  Ingredientes: ${receta.ingredientes.join(", ")}
+  `;
+
+  const API_KEY = process.env.GEMINI_25_API_KEY;
+  const MODEL = "gemini-2.5-flash";
+  const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+  try {
+    const response = await axios.post(
+      ENDPOINT,
+      {
+        contents: [{ parts: [{ text: prompt }] }]
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": API_KEY
+        }
+      }
+    );
+
+    const descripcionGenerada =
+      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    return descripcionGenerada;
+
+  } catch (error) {
+    console.error("Error IA:", error.message);
+
+    // 🔴 fallback: no tirar error
+    return null;
+  }
+};

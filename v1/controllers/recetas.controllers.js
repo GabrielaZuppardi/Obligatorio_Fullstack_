@@ -1,10 +1,11 @@
+import axios from "axios";
 import {obtenerRecetasService, 
         obtenerRecetaPorIdService, 
         crearRecetaService, 
         actualizarRecetaService, 
         eliminarRecetaService,
         obtenerMisRecetasService,
-        buscarRecetasExternasService} from "../services/recetas.services.js";
+        buscarRecetasExternasService, generarDescripcionRecetaService} from "../services/recetas.services.js";
 
  export const obtenerMisRecetasController = async (req, res) => {
     const{page, limit} = req.query;
@@ -61,6 +62,43 @@ export const buscarRecetasExternasController = async (req, res) => {
   } catch (error) {
     res.status(error.status || 500).json({
       mensaje: error.message || "Error interno"
+    });
+  }
+};
+
+export const generarDescripcionRecetaController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const receta = await obtenerRecetaPorIdService(id);
+
+    if (!receta) {
+      return res.status(404).json({
+        mensaje: "Receta no encontrada"
+      });
+    }
+
+    // 👉 ahora delegás
+    const descripcionGenerada = await generarDescripcionRecetaService(receta);
+
+    if (!descripcionGenerada) {
+      return res.status(200).json({
+        mensaje: "No se pudo generar la descripción con IA. La receta no fue modificada."
+      });
+    }
+
+    const recetaActualizada = await actualizarRecetaService(id, {
+      description: descripcionGenerada
+    });
+
+    return res.status(200).json({
+      mensaje: "Descripción generada y guardada correctamente",
+      receta: recetaActualizada
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      mensaje: "Error interno"
     });
   }
 };
