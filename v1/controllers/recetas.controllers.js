@@ -61,7 +61,7 @@ export const obtenerRecetaPorIdController = async (req, res, next) => {
 }; 
 export const crearRecetaController = async (req, res, next) => {
     try {
-        const usuarioId = req.usuario.id; // 👈 esto faltaba
+        const usuarioId = req.usuario.id; 
 
         const recetaCreada = await crearRecetaService(req.body, usuarioId);
 
