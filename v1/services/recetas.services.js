@@ -257,6 +257,7 @@ export const generarDescripcionRecetaService = async (receta) => {
     // 🔴 fallback: no tirar error
     return null;
   }
+};
 export const generarRecetaService = async ({ ingredientes, dificultad, tiempoMaximo }) => {
     console.log("ESTE ES MI SERVER LOCAL");
 
