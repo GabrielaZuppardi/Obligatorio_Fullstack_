@@ -171,7 +171,7 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
       tiempoMaximo
     });
 
-    // 🔴 ESTE ES EL FIX
+    // fallback: si falla IA, no tirar error, sino devolver una receta genérica con los datos proporcionados
     if (!receta) {
       return res.status(503).json({
         mensaje: "Servicio de IA no disponible. Se devuelve una sugerencia alternativa.",
@@ -205,4 +205,3 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
     });
   }
 };
-
