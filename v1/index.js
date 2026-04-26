@@ -9,8 +9,7 @@ import usuariosRouter from './routes/usuarios.routes.js';
 const router = express.Router({mergeParams: true });
 
 //rutas desprotegidas
-router.use ("/categorias", categoriasRouter);
-router.use("/recetas", recetasRouter);
+
 router.use("/auth", authRouter);
 router.use("/usuarios", usuariosRouter);
 

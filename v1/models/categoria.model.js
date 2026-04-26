@@ -5,8 +5,10 @@ import mongoose from "mongoose";
 const categoriaSchema = new mongoose.Schema({
     nombre: {
         type: String,
-        required: true
-        },
+        required: true,
+        unique: true
+    },
+
     descripcion: {
         type: String,
         required: true
