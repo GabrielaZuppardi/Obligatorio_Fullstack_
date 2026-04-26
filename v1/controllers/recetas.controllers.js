@@ -6,18 +6,11 @@ import {obtenerRecetasService,
         actualizarRecetaService, 
         eliminarRecetaService,
         obtenerMisRecetasService,
-        buscarRecetasExternasService, generarDescripcionRecetaService} from "../services/recetas.services.js";
-
- export const obtenerMisRecetasController = async (req, res) => {
-    const{page, limit} = req.query;
-    const usuarioId = req.usuario.id;
-    const respuesta = await obtenerMisRecetasService(usuarioId, page, limit);
-    console.log(req.usuario);
-    res.status(200).json({ mensaje: "Recetas del usuario", ...respuesta });
-}
-        buscarRecetasExternasService,
+        buscarRecetasExternasService, 
+        generarDescripcionRecetaService,
         generarRecetaService} from "../services/recetas.services.js";
 
+ 
  export const obtenerMisRecetasController = async (req, res, next) => {
     try {
         const { page, limit } = req.query;

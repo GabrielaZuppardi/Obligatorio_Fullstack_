@@ -6,8 +6,9 @@ import {obtenerRecetasController,
         eliminarRecetaController,
         obtenerMisRecetasController,
         buscarRecetasExternasController,
-        generarDescripcionRecetaController } from "../controllers/recetas.controllers.js";
-        generarRecetaController} from "../controllers/recetas.controllers.js";
+        generarDescripcionRecetaController,
+        generarRecetaController } from "../controllers/recetas.controllers.js";
+       
 import { validateBody } from "../middlewares/validateBody.middleware.js";
 import { crearRecetaSchema, modificarRecetaSchema } from "../validators/receta.validator.js";
 import { authenticateMiddleware } from "../middlewares/authenticate.middleware.js";

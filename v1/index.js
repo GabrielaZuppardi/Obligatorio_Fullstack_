@@ -17,8 +17,9 @@ router.use(authenticateMiddleware); //todas las rutas debajo de esta línea esta
 
 //rutas protegidas
 
-
-
+router.use("/usuarios", usuariosRouter);
+router.use("/categorias", categoriasRouter);
+router.use("/recetas", recetasRouter);  
 
 
 export default router;
