@@ -252,9 +252,12 @@ export const generarDescripcionRecetaService = async (receta) => {
     return descripcionGenerada;
 
   } catch (error) {
-    console.error("Error IA:", error.message);
+    console.error("Error IA completo:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
 
-    // 🔴 fallback: no tirar error
     return null;
   }
 };
