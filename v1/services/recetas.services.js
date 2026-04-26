@@ -260,24 +260,24 @@ export const generarDescripcionRecetaService = async (receta) => {
 };
 
 export const generarRecetaService = async ({ ingredientes, dificultad, tiempoMaximo }) => {
-    try {
-        console.log("ESTE ES MI SERVER LOCAL");
+  try {
+    console.log("ESTE ES MI SERVER LOCAL");
 
-        const API_KEY = process.env.GEMINI_25_API_KEY;
+    const API_KEY = process.env.GEMINI_25_API_KEY;
 
-        if (!API_KEY) {
-            throw new Error("No existe GEMINI_25_API_KEY en el .env");
-        }
+    if (!API_KEY) {
+      throw new Error("No existe GEMINI_25_API_KEY en el .env");
+    }
 
-        const MODEL = "gemini-2.5-flash";
-        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+    const MODEL = "gemini-2.5-flash";
+    const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
-        const headers = {
-            "Content-Type": "application/json",
-            "x-goog-api-key": API_KEY
-        };
+    const headers = {
+      "Content-Type": "application/json",
+      "x-goog-api-key": API_KEY
+    };
 
-        const prompt = `
+    const prompt = `
 Generá una receta en formato JSON.
 
 Ingredientes: ${(ingredientes || []).join(", ")}
@@ -296,31 +296,36 @@ Respondé SOLO en JSON con:
 }
 `;
 
-        const body = {
-            contents: [
-                {
-                    parts: [{ text: prompt }]
-                }
-            ]
-        };
-
-        const response = await axios.post(ENDPOINT, body, { headers });
-
-        const textoIA = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!textoIA) {
-            throw new Error("Gemini no devolvió texto válido");
+    const body = {
+      contents: [
+        {
+          parts: [{ text: prompt }]
         }
+      ]
+    };
 
-        const textoLimpio = textoIA
-            .replace(/```json/g, "")
-            .replace(/```/g, "")
-            .trim();
+    const response = await axios.post(ENDPOINT, body, { headers });
 
-        return JSON.parse(textoLimpio);
+    const textoIA = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    } catch (error) {
-        console.log("ERROR IA:", error.response?.data || error.message);
-        throw error;
+    if (!textoIA) {
+      throw new Error("Gemini no devolvió texto válido");
     }
+
+    const textoLimpio = textoIA
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    return JSON.parse(textoLimpio);
+
+  } catch (error) {
+    console.error("Error IA completo:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+
+    return null;
+  }
 };

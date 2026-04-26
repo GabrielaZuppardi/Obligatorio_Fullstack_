@@ -138,7 +138,7 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
     const descripcionGenerada = await generarDescripcionRecetaService(receta);
 
     if (!descripcionGenerada) {
-      return res.status(200).json({
+      return res.status(503).json({
         mensaje: "No se pudo generar la descripción con IA. La receta no fue modificada."
       });
     }
@@ -179,7 +179,7 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
     } catch (error) {
 
         // fallback en caso de error en el servicio de IA
-        res.status(200).json({
+        res.status(503).json({
             mensaje: "Servicio de IA no disponible. Se devuelve una sugerencia alternativa.",
             fallback: true,
             receta: {
