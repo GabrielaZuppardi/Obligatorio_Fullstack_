@@ -48,7 +48,7 @@ export const obtenerUsuarioPorIdService = async (id) => {
 };  
 
 // Este servicio se puede usar para crear usuarios desde un admin, pero no para el registro público
-export const crearUsuarioService = async (usuario) => {
+export const crearAdminService = async (usuario) => {
 
     const { email } = usuario;
 
@@ -60,16 +60,19 @@ export const crearUsuarioService = async (usuario) => {
         throw error;
     }
 
+    // Forzar rol admin
+    usuario.rol = "administrador";
+ 
+
     const nuevoUsuario = new Usuario(usuario);
 
-    await nuevoUsuario.save(); // usa pre-save para hash
+    await nuevoUsuario.save();
 
     const usuarioSinPassword = nuevoUsuario.toObject();
     delete usuarioSinPassword.password;
 
     return usuarioSinPassword;
-};  
-
+};
 
 export const actualizarUsuarioService = async (id, usuario) => {
 

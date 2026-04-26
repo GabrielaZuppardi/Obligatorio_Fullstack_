@@ -1,7 +1,7 @@
 import express from "express";
 import { obtenerUsuariosController, 
     obtenerUsuarioPorIdController, 
-    crearUsuarioController, 
+    crearAdminController, 
     actualizarUsuarioController, 
     eliminarUsuarioController } from "../controllers/usuarios.controllers.js";
 import { validateBody } from "../middlewares/validateBody.middleware.js";
@@ -12,7 +12,7 @@ const router = express.Router({ mergeParams: true });
 
 router.get("/",  authorizeRoles("administrador"),  obtenerUsuariosController);
 router.get("/:id",  authorizeRoles("administrador"), obtenerUsuarioPorIdController);
-router.post("/", authorizeRoles("administrador"), validateBody(crearUsuarioSchema), crearUsuarioController);
+router.post("/", authorizeRoles("administrador"), validateBody(crearUsuarioSchema), crearAdminController);
 router.patch("/:id",  authorizeRoles("administrador"), validateBody(modificarUsuarioSchema), actualizarUsuarioController);
 router.delete("/:id",  authorizeRoles("administrador"), eliminarUsuarioController);
 

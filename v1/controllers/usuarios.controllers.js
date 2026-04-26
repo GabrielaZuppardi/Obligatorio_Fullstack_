@@ -1,6 +1,6 @@
 import {obtenerUsuariosService, 
         obtenerUsuarioPorIdService, 
-        crearUsuarioService, 
+        crearAdminService, 
         actualizarUsuarioService, 
         eliminarUsuarioService} from "../services/usuarios.services.js";
 
@@ -36,13 +36,13 @@ export const obtenerUsuarioPorIdController = async (req, res, next) => {
     }
 }; 
 
-export const crearUsuarioController = async (req, res, next) => {
+export const crearAdminController = async (req, res, next) => {
     try {
-        const usuarioCreado = await crearUsuarioService(req.body);
+        const adminCreado = await crearAdminService(req.body);
 
         res.status(201).json({
-            mensaje: "Usuario creado correctamente",
-            usuario: usuarioCreado
+            mensaje: "Administrador creado correctamente",
+            usuario: adminCreado
         });
 
     } catch (error) {
