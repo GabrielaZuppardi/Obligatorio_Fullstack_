@@ -116,7 +116,7 @@ export const crearRecetaService = async (receta, usuarioId) => {
             throw error;
         }
     }
-
+console.log("ANTES DE CREAR RECETA");
     const nuevaReceta = new Receta({
         ...receta,
         titulo: titulo.trim(),
@@ -124,7 +124,7 @@ export const crearRecetaService = async (receta, usuarioId) => {
     });
 
     await nuevaReceta.save();
-
+console.log("RECETA GUARDADA:", nuevaReceta._id);
     return nuevaReceta;
 };
 
