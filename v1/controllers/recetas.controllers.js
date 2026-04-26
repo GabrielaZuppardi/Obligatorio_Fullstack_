@@ -1,3 +1,4 @@
+import axios from "axios";
 import usuarioModel from "../models/usuario.model.js";
 import {obtenerRecetasService, 
         obtenerRecetaPorIdService, 
@@ -5,6 +6,15 @@ import {obtenerRecetasService,
         actualizarRecetaService, 
         eliminarRecetaService,
         obtenerMisRecetasService,
+        buscarRecetasExternasService, generarDescripcionRecetaService} from "../services/recetas.services.js";
+
+ export const obtenerMisRecetasController = async (req, res) => {
+    const{page, limit} = req.query;
+    const usuarioId = req.usuario.id;
+    const respuesta = await obtenerMisRecetasService(usuarioId, page, limit);
+    console.log(req.usuario);
+    res.status(200).json({ mensaje: "Recetas del usuario", ...respuesta });
+}
         buscarRecetasExternasService,
         generarRecetaService} from "../services/recetas.services.js";
 
@@ -125,6 +135,42 @@ export const buscarRecetasExternasController = async (req, res, next) => {
   }
 };
 
+export const generarDescripcionRecetaController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const receta = await obtenerRecetaPorIdService(id);
+
+    if (!receta) {
+      return res.status(404).json({
+        mensaje: "Receta no encontrada"
+      });
+    }
+
+    // 👉 ahora delegás
+    const descripcionGenerada = await generarDescripcionRecetaService(receta);
+
+    if (!descripcionGenerada) {
+      return res.status(200).json({
+        mensaje: "No se pudo generar la descripción con IA. La receta no fue modificada."
+      });
+    }
+
+    const recetaActualizada = await actualizarRecetaService(id, {
+      description: descripcionGenerada
+    });
+
+    return res.status(200).json({
+      mensaje: "Descripción generada y guardada correctamente",
+      receta: recetaActualizada
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      mensaje: "Error interno"
+    });
+  }
+};
  export const generarRecetaController = async (req, res) => {
     try {
         const { ingredientes, dificultad, tiempoMaximo } = req.body;

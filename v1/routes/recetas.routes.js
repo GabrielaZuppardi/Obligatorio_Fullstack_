@@ -6,6 +6,7 @@ import {obtenerRecetasController,
         eliminarRecetaController,
         obtenerMisRecetasController,
         buscarRecetasExternasController,
+        generarDescripcionRecetaController } from "../controllers/recetas.controllers.js";
         generarRecetaController} from "../controllers/recetas.controllers.js";
 import { validateBody } from "../middlewares/validateBody.middleware.js";
 import { crearRecetaSchema, modificarRecetaSchema } from "../validators/receta.validator.js";
@@ -24,6 +25,7 @@ router.get("/:id", obtenerRecetaPorIdController);
 router.post("/",authenticateMiddleware,validateBody(crearRecetaSchema), crearRecetaController);
 router.patch("/:id", validateBody(modificarRecetaSchema), actualizarRecetaController);
 router.delete("/:id", eliminarRecetaController);
+router.post("/recetas/:id/generar-descripcion", generarDescripcionRecetaController);
 
 
 

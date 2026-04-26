@@ -11,13 +11,13 @@ const router = express.Router({mergeParams: true });
 //rutas desprotegidas
 
 router.use("/auth", authRouter);
+router.use("/usuarios", usuariosRouter);
 
 router.use(authenticateMiddleware); //todas las rutas debajo de esta línea estarán protegidas por el middleware de autenticación
 
 //rutas protegidas
-router.use("/usuarios", usuariosRouter);
-router.use ("/categorias", categoriasRouter);
-router.use("/recetas", recetasRouter);
+
+
 
 
 
