@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import usuario from "./usuario.model.js";
 import categoria from "./categoria.model.js";
 
-const recipeSchema = new mongoose.Schema(
+const recetaSchema = new mongoose.Schema(
   {
     titulo: {
       type: String,
@@ -60,4 +60,4 @@ const recipeSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model('Receta', recipeSchema); //como tercer parámetro puedo porner el nombre explicito de la colección, si no se pone, mongoose lo toma del nombre del modelo y lo pluraliza, en este caso sería "recetas".
+export default mongoose.model('Receta', recetaSchema); //como tercer parámetro puedo porner el nombre explicito de la colección, si no se pone, mongoose lo toma del nombre del modelo y lo pluraliza, en este caso sería "recetas".
