@@ -19,7 +19,7 @@ const router = express.Router();
 
 
 // Rutas especiales primero
-router.post("/:id/generar-descripcion", generarDescripcionRecetaController);
+router.post("/:id/generar-descripcion", authenticateMiddleware, generarDescripcionRecetaController);
 router.post("/generar", generarRecetaController);
 router.get("/externas", buscarRecetasExternasController);
 router.get("/mias", authenticateMiddleware, obtenerMisRecetasController);
