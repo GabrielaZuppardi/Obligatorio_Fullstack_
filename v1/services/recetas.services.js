@@ -104,7 +104,17 @@ export const crearRecetaService = async (receta, usuarioId) => {
         error.status = 409;
         throw error;
     }
+      if (usuarioExiste.plan === "plus") {
 
+        const cantidadRecetas = await Receta.countDocuments({
+            usuario: usuarioId
+        });
+
+        if (cantidadRecetas >= 4) {
+            const error = new Error("Límite de recetas alcanzado para plan plus");
+            error.status = 403;
+            throw error;
+        }
     const nuevaReceta = new Receta({
         ...receta,
         titulo: titulo.trim(),
@@ -115,7 +125,7 @@ export const crearRecetaService = async (receta, usuarioId) => {
 
     return nuevaReceta;
 };
-
+}
 export const actualizarRecetaService = async (id, receta, usuarioId) => {
     if (!isValidObjectId(id)) {
         const error = new Error("El id no es válido");

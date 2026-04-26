@@ -205,3 +205,4 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
     });
   }
 };
+

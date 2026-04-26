@@ -7,7 +7,8 @@ import {obtenerRecetasController,
         obtenerMisRecetasController,
         buscarRecetasExternasController,
         generarDescripcionRecetaController,
-        generarRecetaController } from "../controllers/recetas.controllers.js";
+        generarRecetaController,
+       } from "../controllers/recetas.controllers.js";
        
 import { validateBody } from "../middlewares/validateBody.middleware.js";
 import { crearRecetaSchema, modificarRecetaSchema } from "../validators/receta.validator.js";
@@ -23,6 +24,7 @@ router.post("/:id/generar-descripcion", authenticateMiddleware, generarDescripci
 router.post("/generar", generarRecetaController);
 router.get("/externas", buscarRecetasExternasController);
 router.get("/mias", authenticateMiddleware, obtenerMisRecetasController);
+
 
 // CRUD base
 router.get("/", obtenerRecetasController);

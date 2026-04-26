@@ -70,7 +70,6 @@ export const crearUsuarioService = async (usuario) => {
     return usuarioSinPassword;
 };  
 
-
 export const actualizarUsuarioService = async (id, usuario) => {
 
     // 🔹 Validar id
@@ -80,11 +79,13 @@ export const actualizarUsuarioService = async (id, usuario) => {
         throw error;
     }
 
-    const { email, password } = usuario;
+    // 🔹 Sacamos campos sensibles o que requieren tratamiento especial
+    const { email, password, plan, ...datosPermitidos } = usuario;
 
-    let datosActualizados = { ...usuario };
+    // 🔹 Solo los campos permitidos pasan directo
+    let datosActualizados = { ...datosPermitidos };
 
-    // 🔹 Control duplicado email
+    // 🔹 Validar email duplicado (si viene)
     if (email) {
         const usuarioExistente = await Usuario.findOne({
             email,
@@ -96,14 +97,20 @@ export const actualizarUsuarioService = async (id, usuario) => {
             error.status = 409;
             throw error;
         }
+
+        datosActualizados.email = email;
     }
 
-    // Si actualizan password → hay que hashear manualmente
+    // 🔹 Hashear password (si viene)
     if (password) {
-        const passwordHash = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS));
+        const passwordHash = await bcrypt.hash(
+            password,
+            Number(process.env.SALT_ROUNDS)
+        );
         datosActualizados.password = passwordHash;
     }
 
+    // 🔹 Actualizar usuario
     const usuarioActualizado = await Usuario.findByIdAndUpdate(
         id,
         datosActualizados,
@@ -119,6 +126,7 @@ export const actualizarUsuarioService = async (id, usuario) => {
 
     return usuarioActualizado;
 };
+
 export const eliminarUsuarioService = async (id) => {
 
     if (!isValidObjectId(id)) {
@@ -136,4 +144,34 @@ export const eliminarUsuarioService = async (id) => {
     }
 
     return usuarioEliminado;
+};
+
+export const cambiarPlanAPremiumService = async (usuarioId) => {
+  const usuario = await Usuario.findById(usuarioId);
+
+  if (!usuario) {
+    const error = new Error("Usuario no encontrado");
+    error.status = 404;
+    throw error;
+  }
+
+  if (usuario.plan !== "plus") {
+    const error = new Error("Solo los usuarios con plan plus pueden cambiar a premium");
+    error.status = 400;
+    throw error;
+  }
+
+  if (usuario.rol !== "usuario") {
+  const error = new Error("Este perfil de usuario no puede cambiar de plan");
+  error.status = 403;
+  throw error;
+}
+
+  usuario.plan = "premium";
+  await usuario.save();
+
+  const usuarioSinPassword = usuario.toObject();
+  delete usuarioSinPassword.password;
+
+  return usuarioSinPassword;
 };
