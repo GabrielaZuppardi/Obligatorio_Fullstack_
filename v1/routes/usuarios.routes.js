@@ -3,13 +3,16 @@ import { obtenerUsuariosController,
     obtenerUsuarioPorIdController, 
     crearAdminController, 
     actualizarUsuarioController, 
-    eliminarUsuarioController } from "../controllers/usuarios.controllers.js";
+    eliminarUsuarioController,
+    cambiarPlanAPremiumController} from "../controllers/usuarios.controllers.js";
 import { validateBody } from "../middlewares/validateBody.middleware.js";
 import { crearUsuarioSchema, modificarUsuarioSchema } from "../validators/usuario.validator.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.middleware.js";
+import { authenticateMiddleware } from "../middlewares/authenticate.middleware.js";
 
 const router = express.Router({ mergeParams: true });
 
+router.patch("/premium", authenticateMiddleware, authorizeRoles("usuario"), cambiarPlanAPremiumController);
 router.get("/",  authorizeRoles("administrador"),  obtenerUsuariosController);
 router.get("/:id",  authorizeRoles("administrador"), obtenerUsuarioPorIdController);
 router.post("/", authorizeRoles("administrador"), validateBody(crearUsuarioSchema), crearAdminController);

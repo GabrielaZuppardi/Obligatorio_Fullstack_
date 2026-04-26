@@ -2,7 +2,8 @@ import {obtenerUsuariosService,
         obtenerUsuarioPorIdService, 
         crearAdminService, 
         actualizarUsuarioService, 
-        eliminarUsuarioService} from "../services/usuarios.services.js";
+        eliminarUsuarioService,
+        cambiarPlanAPremiumService} from "../services/usuarios.services.js";
 
 export const obtenerUsuariosController = async (req, res, next) => {
     try {
@@ -81,4 +82,20 @@ export const eliminarUsuarioController = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+export const cambiarPlanAPremiumController = async (req, res, next) => {
+  try {
+    const usuarioId = req.usuario.id;
+
+    const usuarioActualizado = await cambiarPlanAPremiumService(usuarioId);
+
+    res.status(200).json({
+      mensaje: "Plan actualizado a premium correctamente",
+      usuario: usuarioActualizado
+    });
+
+  } catch (error) {
+    next(error);
+  }
 };

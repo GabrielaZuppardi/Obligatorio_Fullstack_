@@ -105,14 +105,27 @@ export const crearRecetaService = async (receta, usuarioId) => {
         throw error;
     }
 
+    if (usuarioExiste.plan === "plus") {
+        const cantidadRecetas = await Receta.countDocuments({
+              usuario: usuarioExiste._id
+           
+        });
+
+        if (cantidadRecetas >= 4) {
+            const error = new Error("Límite de recetas alcanzado para plan plus");
+            error.status = 403;
+            throw error;
+        }
+    }
+    
     const nuevaReceta = new Receta({
         ...receta,
         titulo: titulo.trim(),
-        usuario: usuarioId
+        usuario: usuarioExiste._id
     });
 
     await nuevaReceta.save();
-
+console.log("RECETA GUARDADA:", nuevaReceta._id);
     return nuevaReceta;
 };
 
@@ -257,28 +270,38 @@ Ingredientes: ${ingredientes}
     return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
 
   } catch (error) {
-    console.log("ERROR IA:", error.response?.data || error.message);
+    console.error("Error IA completo:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+
     return null;
   }
 };
 
-
 export const generarRecetaService = async ({ ingredientes, dificultad, tiempoMaximo }) => {
+  try {
     console.log("ESTE ES MI SERVER LOCAL");
 
     const API_KEY = process.env.GEMINI_25_API_KEY;
-    const MODEL = 'gemini-2.5-flash';
+
+    if (!API_KEY) {
+      throw new Error("No existe GEMINI_25_API_KEY en el .env");
+    }
+
+    const MODEL = "gemini-2.5-flash";
     const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
     const headers = {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': API_KEY
+      "Content-Type": "application/json",
+      "x-goog-api-key": API_KEY
     };
 
     const prompt = `
 Generá una receta en formato JSON.
 
-Ingredientes: ${ingredientes.join(", ")}
+Ingredientes: ${(ingredientes || []).join(", ")}
 Dificultad: ${dificultad}
 Tiempo máximo: ${tiempoMaximo} minutos
 
@@ -288,35 +311,42 @@ Respondé SOLO en JSON con:
   "descripcion": "",
   "ingredientes": [],
   "pasos": [],
-  "tiempoPreparacion": number,
+  "tiempoPreparacion": 0,
   "dificultad": "",
-  "porciones": number
+  "porciones": 0
 }
 `;
 
     const body = {
-        contents: [
-            { parts: [{ text: prompt }] }
-        ]
+      contents: [
+        {
+          parts: [{ text: prompt }]
+        }
+      ]
     };
 
     const response = await axios.post(ENDPOINT, body, { headers });
 
-    const textoIA = response.data.candidates[0].content.parts[0].text;
+    const textoIA = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // opcional: intentar parsear
-    try {
-        const textoLimpio = textoIA
-  .replace(/```json/g, "")
-  .replace(/```/g, "")
-  .trim();
-
-        return JSON.parse(textoLimpio);
-    } catch (error) {
-
-        // 🔥 ESTE ES EL LOG IMPORTANTE
-        console.log("ERROR IA:", error.response?.data || error.message);
-
-        throw error; // esto hace que el controller active el fallback
+    if (!textoIA) {
+      throw new Error("Gemini no devolvió texto válido");
     }
+
+    const textoLimpio = textoIA
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    return JSON.parse(textoLimpio);
+
+  } catch (error) {
+    console.error("Error IA completo:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+
+    return null;
+  }
 };
