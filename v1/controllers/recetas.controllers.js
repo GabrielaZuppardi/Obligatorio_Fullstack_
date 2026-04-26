@@ -7,7 +7,8 @@ import {obtenerRecetasService,
         eliminarRecetaService,
         obtenerMisRecetasService,
         buscarRecetasExternasService, generarDescripcionRecetaService, generarRecetaService} from "../services/recetas.services.js";
-
+import cloudinary from "../config/cloudinary.js";
+import { uploadBufferToCloudinary } from "../utils/cloudinary.util.js";
  
  export const obtenerMisRecetasController = async (req, res, next) => {
     try {
@@ -57,11 +58,36 @@ export const obtenerRecetaPorIdController = async (req, res, next) => {
         next(error);
     }
 }; 
+
+
+
 export const crearRecetaController = async (req, res, next) => {
     try {
-        const usuarioId = req.usuario.id; // 👈 esto faltaba
+        const usuarioId = req.usuario.id;
 
-        const recetaCreada = await crearRecetaService(req.body, usuarioId);
+        let imageUrl = null;
+
+        // 👇 si viene imagen, subirla
+        if (req.file) {
+            const result = await uploadBufferToCloudinary(
+                cloudinary,
+                req.file.buffer,
+                {
+                    resource_type: "auto",
+                    folder: "recetas"
+                }
+            );
+
+            imageUrl = result.secure_url;
+        }
+
+        // 👇 agregar imageUrl al body
+        const recetaData = {
+            ...req.body,
+            imageUrl
+        };
+
+        const recetaCreada = await crearRecetaService(recetaData, usuarioId);
 
         res.status(201).json({
             mensaje: "Receta creada correctamente",
@@ -72,6 +98,7 @@ export const crearRecetaController = async (req, res, next) => {
         next(error);
     }
 };
+
 export const actualizarRecetaController = async (req, res, next) => {
     try {
         const { id } = req.params;

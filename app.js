@@ -1,11 +1,11 @@
+import "dotenv/config"; // Cargar variables de entorno desde el archivo .env
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import v1Router from "./v1/index.js"; // Importar rutas de la versión 1   
 import { notFoundMiddleware } from './v1/middlewares/notFound.middleware.js';
 import { errorMiddleware } from './v1/middlewares/error.middleware.js'; 
 import connectDB from './v1/config/db.config.js';
-dotenv.config();
+
 
 const app = express();
 

@@ -220,21 +220,27 @@ export const buscarRecetasExternasService = async (query) => {
 };
 
 export const generarDescripcionRecetaService = async (receta) => {
-  const prompt = `
-  Generá una descripción breve (máximo 2 líneas) para esta receta:
+  const ingredientes = Array.isArray(receta.ingredientes)
+    ? receta.ingredientes.join(", ")
+    : "";
 
-  Título: ${receta.titulo}
-  Categoría: ${receta.categoria?.nombre}
-  Ingredientes: ${receta.ingredientes.join(", ")}
-  `;
+  const prompt = `
+Generá una descripción breve (máximo 2 líneas) para esta receta:
+
+Título: ${receta.titulo}
+Categoría: ${receta.categoria?.nombre || "Sin categoría"}
+Ingredientes: ${ingredientes}
+`;
 
   const API_KEY = process.env.GEMINI_25_API_KEY;
-  const MODEL = "gemini-2.5-flash";
-  const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+  if (!API_KEY) {
+    throw new Error("Falta GEMINI_25_API_KEY");
+  }
 
   try {
     const response = await axios.post(
-      ENDPOINT,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
       {
         contents: [{ parts: [{ text: prompt }] }]
       },
@@ -246,18 +252,17 @@ export const generarDescripcionRecetaService = async (receta) => {
       }
     );
 
-    const descripcionGenerada =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    console.log("RESPUESTA IA:", JSON.stringify(response.data, null, 2));
 
-    return descripcionGenerada;
+    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
 
   } catch (error) {
-    console.error("Error IA:", error.message);
-
-    // 🔴 fallback: no tirar error
+    console.log("ERROR IA:", error.response?.data || error.message);
     return null;
   }
 };
+
+
 export const generarRecetaService = async ({ ingredientes, dificultad, tiempoMaximo }) => {
     console.log("ESTE ES MI SERVER LOCAL");
 

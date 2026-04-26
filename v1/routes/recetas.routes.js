@@ -11,6 +11,8 @@ import {obtenerRecetasController,
 import { validateBody } from "../middlewares/validateBody.middleware.js";
 import { crearRecetaSchema, modificarRecetaSchema } from "../validators/receta.validator.js";
 import { authenticateMiddleware } from "../middlewares/authenticate.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
+import { parseArrayFields } from "../middlewares/parseArrayFields.middleware.js";
 
 const router = express.Router();
 
@@ -22,10 +24,10 @@ router.get("/", obtenerRecetasController);
 router.get("/:id", obtenerRecetaPorIdController);
 
 
-router.post("/",authenticateMiddleware,validateBody(crearRecetaSchema), crearRecetaController);
+router.post("/",authenticateMiddleware, upload.single("imagen"), parseArrayFields(["ingredientes", "pasos"]), validateBody(crearRecetaSchema), crearRecetaController);
 router.patch("/:id", validateBody(modificarRecetaSchema), actualizarRecetaController);
 router.delete("/:id", eliminarRecetaController);
-router.post("/recetas/:id/generar-descripcion", generarDescripcionRecetaController);
+router.post("/:id/generar-descripcion", authenticateMiddleware, generarDescripcionRecetaController);
 
 
 
