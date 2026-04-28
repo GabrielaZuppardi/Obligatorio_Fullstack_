@@ -24,7 +24,14 @@ export const crearUsuarioSchema = Joi.object({
       "any.required": "El email es obligatorio"
     }),
 
-
+   password: Joi.string()
+   .min(6)
+   .required()
+   .messages({
+    "string.empty": "La contraseña no puede estar vacía",
+    "string.min": "La contraseña debe tener al menos 6 caracteres",
+    "any.required": "La contraseña es obligatoria"
+  }),
 
   rol: Joi.string()
     .valid("usuario", "administrador")
