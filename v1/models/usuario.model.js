@@ -41,8 +41,9 @@ const usuarioSchema = new mongoose.Schema({
 usuarioSchema.pre("save", function () {
     if (!this.isModified("password")) return;
 
-    const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
-    this.password = bcrypt.hashSync(this.password, salt);
+  const saltRounds = Number(process.env.SALT_ROUNDS) || 12;
+  const salt = bcrypt.genSaltSync(saltRounds);
+  this.password = bcrypt.hashSync(this.password, salt);
 });
 
 export default mongoose.model("Usuario", usuarioSchema); 
