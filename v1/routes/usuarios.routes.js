@@ -12,7 +12,7 @@ import { authenticateMiddleware } from "../middlewares/authenticate.middleware.j
 
 const router = express.Router({ mergeParams: true });
 
-router.patch("/premium", authenticateMiddleware, authorizeRoles("usuario"), cambiarPlanAPremiumController);
+router.patch("/premium", authorizeRoles("usuario"), cambiarPlanAPremiumController);
 router.get("/",  authorizeRoles("administrador"),  obtenerUsuariosController);
 router.get("/:id",  authorizeRoles("administrador"), obtenerUsuarioPorIdController);
 router.post("/", authorizeRoles("administrador"), validateBody(crearUsuarioSchema), crearUsuarioController);
