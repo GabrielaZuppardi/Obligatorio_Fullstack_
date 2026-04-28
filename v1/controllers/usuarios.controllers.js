@@ -1,6 +1,6 @@
 import {obtenerUsuariosService, 
         obtenerUsuarioPorIdService, 
-        crearUsuarioService, 
+        crearAdministradorService, 
         actualizarUsuarioService, 
         eliminarUsuarioService,
         cambiarPlanAPremiumService} from "../services/usuarios.services.js";
@@ -32,16 +32,19 @@ export const obtenerUsuarioPorIdController = async (req, res, next) => {
 
    }; 
 
-export const crearUsuarioController = async (req, res, next) => {
-    
-        const usuarioCreado = await crearUsuarioService(req.body);
+export const crearAdministradorController = async (req, res, next) => {
+    try {
+        const administrador = await crearAdministradorService(req.body);
 
         res.status(201).json({
-            mensaje: "Usuario creado correctamente",
-            usuario: usuarioCreado
+            mensaje: "Administrador creado correctamente",
+            administrador
         });
- 
-}
+
+    } catch (error) {
+        next(error);
+    }
+};
 
 
 export const actualizarUsuarioController = async (req, res, next) => {

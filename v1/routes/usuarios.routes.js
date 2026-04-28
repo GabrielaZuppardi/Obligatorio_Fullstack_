@@ -1,7 +1,7 @@
 import express from "express";
 import { obtenerUsuariosController, 
     obtenerUsuarioPorIdController, 
-    crearUsuarioController, 
+    crearAdministradorController, 
     actualizarUsuarioController, 
     eliminarUsuarioController,
     cambiarPlanAPremiumController} from "../controllers/usuarios.controllers.js";
@@ -15,7 +15,7 @@ const router = express.Router({ mergeParams: true });
 router.patch("/premium", authorizeRoles("usuario"), cambiarPlanAPremiumController);
 router.get("/",  authorizeRoles("administrador"),  obtenerUsuariosController);
 router.get("/:id",  authorizeRoles("administrador"), obtenerUsuarioPorIdController);
-router.post("/", authorizeRoles("administrador"), validateBody(crearUsuarioSchema), crearUsuarioController);
+router.post("/", authorizeRoles("administrador"), validateBody(crearUsuarioSchema), crearAdministradorController);
 router.patch("/:id",  authorizeRoles("administrador"), validateBody(modificarUsuarioSchema), actualizarUsuarioController);
 router.delete("/:id",  authorizeRoles("administrador"), eliminarUsuarioController);
 
