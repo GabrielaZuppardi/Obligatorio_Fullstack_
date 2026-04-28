@@ -1,7 +1,7 @@
 import {registrarUsuarioService, loginUsuarioService} from "../services/auth.services.js";
 
 export const registrarUsuario = async (req, res, next) => {
-  try {
+
     const { usuario, token } = await registrarUsuarioService(req.body);
 
     res.status(201).json({
@@ -10,9 +10,7 @@ export const registrarUsuario = async (req, res, next) => {
       token
     });
 
-  } catch (error) {
-    next(error);
-  }
+ 
 };
 
 export const loginUsuario = async (req, res, next) => {
