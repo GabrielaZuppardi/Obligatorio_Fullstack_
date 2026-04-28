@@ -6,7 +6,7 @@ import {obtenerUsuariosService,
         cambiarPlanAPremiumService} from "../services/usuarios.services.js";
 
 export const obtenerUsuariosController = async (req, res, next) => {
-    try {
+    
         const { page, limit } = req.query;
 
         const respuesta = await obtenerUsuariosService(page, limit);
@@ -16,13 +16,11 @@ export const obtenerUsuariosController = async (req, res, next) => {
             ...respuesta
         });
 
-    } catch (error) {
-        next(error);
-    }
+    
 };
 
 export const obtenerUsuarioPorIdController = async (req, res, next) => {
-    try {
+   
         const { id } = req.params;
 
         const usuarioEncontrado = await obtenerUsuarioPorIdService(id);
@@ -32,28 +30,22 @@ export const obtenerUsuarioPorIdController = async (req, res, next) => {
             usuario: usuarioEncontrado
         });
 
-    } catch (error) {
-        next(error);
-    }
-}; 
+   }; 
 
 export const crearUsuarioController = async (req, res, next) => {
-    try {
+    
         const usuarioCreado = await crearUsuarioService(req.body);
 
         res.status(201).json({
             mensaje: "Usuario creado correctamente",
             usuario: usuarioCreado
         });
-
-    } catch (error) {
-        next(error);
-    }
+ 
 }
 
 
 export const actualizarUsuarioController = async (req, res, next) => {
-    try {
+   
         const { id } = req.params;
 
         const usuarioActualizado = await actualizarUsuarioService(id, req.body);
@@ -62,14 +54,10 @@ export const actualizarUsuarioController = async (req, res, next) => {
             mensaje: "Usuario actualizado correctamente",
             usuario: usuarioActualizado
         });
-
-    } catch (error) {
-        next(error);
-    }
-};
+   };
 
 export const eliminarUsuarioController = async (req, res, next) => {
-    try {
+ 
         const { id } = req.params;
 
         const usuarioEliminado = await eliminarUsuarioService(id);
@@ -78,14 +66,11 @@ export const eliminarUsuarioController = async (req, res, next) => {
             mensaje: "Usuario eliminado correctamente",
             usuario: usuarioEliminado
         });
-
-    } catch (error) {
-        next(error);
-    }
+   
 };
 
 export const cambiarPlanAPremiumController = async (req, res, next) => {
-  try {
+  
     const usuarioId = req.usuario.id;
 
     const usuarioActualizado = await cambiarPlanAPremiumService(usuarioId);
@@ -95,7 +80,5 @@ export const cambiarPlanAPremiumController = async (req, res, next) => {
       usuario: usuarioActualizado
     });
 
-  } catch (error) {
-    next(error);
-  }
+  
 };

@@ -30,7 +30,7 @@ router.get("/mias", authenticateMiddleware, obtenerMisRecetasController);
 router.get("/", obtenerRecetasController);
 router.get("/:id", obtenerRecetaPorIdController);
 
-router.post("/", authenticateMiddleware, validateBody(crearRecetaSchema), crearRecetaController);
+router.post("/", validateBody(crearRecetaSchema), crearRecetaController);
 router.patch("/:id", validateBody(modificarRecetaSchema), actualizarRecetaController);
 router.delete("/:id", eliminarRecetaController);
 

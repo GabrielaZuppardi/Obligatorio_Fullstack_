@@ -12,7 +12,7 @@ import {obtenerRecetasService,
 
  
  export const obtenerMisRecetasController = async (req, res, next) => {
-    try {
+    
         const { page, limit } = req.query;
         const usuarioId = req.usuario.id;
 
@@ -23,13 +23,10 @@ import {obtenerRecetasService,
             ...respuesta
         });
 
-    } catch (error) {
-        next(error);
-    }
 };
         
 export const obtenerRecetasController = async (req, res, next) => {
-    try {
+    
         const { page, limit } = req.query;
 
         const respuesta = await obtenerRecetasService(page, limit);
@@ -39,13 +36,10 @@ export const obtenerRecetasController = async (req, res, next) => {
             ...respuesta
         });
 
-    } catch (error) {
-        next(error);
-    }
 };
 
 export const obtenerRecetaPorIdController = async (req, res, next) => {
-    try {
+   
         const { id } = req.params;
 
         const receta = await obtenerRecetaPorIdService(id);
@@ -55,12 +49,11 @@ export const obtenerRecetaPorIdController = async (req, res, next) => {
             receta
         });
 
-    } catch (error) {
-        next(error);
-    }
+    
+    
 }; 
 export const crearRecetaController = async (req, res, next) => {
-    try {
+  
         const usuarioId = req.usuario.id; 
 
         const recetaCreada = await crearRecetaService(req.body, usuarioId);
@@ -69,13 +62,11 @@ export const crearRecetaController = async (req, res, next) => {
             mensaje: "Receta creada correctamente",
             receta: recetaCreada
         });
+ 
+  };
 
-    } catch (error) {
-        next(error);
-    }
-};
 export const actualizarRecetaController = async (req, res, next) => {
-    try {
+   
         const { id } = req.params;
 
         const recetaActualizada = await actualizarRecetaService(id, req.body);
@@ -85,13 +76,10 @@ export const actualizarRecetaController = async (req, res, next) => {
             receta: recetaActualizada
         });
 
-    } catch (error) {
-        next(error);
-    }
 };
 
 export const eliminarRecetaController = async (req, res, next) => {
-    try {
+    
         const { id } = req.params;
 
         const recetaEliminada = await eliminarRecetaService(id);
@@ -100,14 +88,10 @@ export const eliminarRecetaController = async (req, res, next) => {
             mensaje: "Receta eliminada correctamente",
             receta: recetaEliminada
         });
-
-    } catch (error) {
-        next(error);
-    }
 };
 
 export const buscarRecetasExternasController = async (req, res, next) => {
-  try {
+
     const { query } = req.query;
 
     if (!query) {
@@ -123,13 +107,11 @@ export const buscarRecetasExternasController = async (req, res, next) => {
       ...resultado
     });
 
-  } catch (error) {
-    next(error);
-  }
+ 
 };
 
 export const generarDescripcionRecetaController = async (req, res, next) => {
-  try {
+
     const { id } = req.params;
     const usuarioId = req.usuario.id;
 
@@ -156,13 +138,11 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
       receta: recetaActualizada
     });
 
-  } catch (error) {
-    next(error);
-  }
+  
 };
 
  export const generarRecetaController = async (req, res) => {
-  try {
+ 
     const { ingredientes, dificultad, tiempoMaximo } = req.body;
 
     const receta = await generarRecetaService({
@@ -199,10 +179,5 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
       receta
     });
 
-  } catch (error) {
-    return res.status(500).json({
-      mensaje: "Error inesperado al generar la receta"
-    });
-  }
-};
+    };
 

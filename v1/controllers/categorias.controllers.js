@@ -7,7 +7,7 @@
 //en los controlleers no debo devolver errores
 
  export const obtenerCategoriasController = async (req, res, next) => {
-    try {
+   
         const { page, limit } = req.query;
 
         const categorias = await obtenerCategoriasService(page, limit);
@@ -17,13 +17,10 @@
             ...categorias
         });
 
-    } catch (error) {
-        next(error);
-    }
 };
 
 export const obtenerCategoriaPorIdController = async (req, res, next) => {
-    try {
+   
         const { id } = req.params;
 
         const categoria = await obtenerCategoriaPorIdService(id);
@@ -32,29 +29,21 @@ export const obtenerCategoriaPorIdController = async (req, res, next) => {
             mensaje: "Categoría obtenida correctamente",
             categoria
         });
-
-    } catch (error) {
-        next(error);
-    }
 };
 
 export const crearCategoriaController = async (req, res, next) => {
-    try {
+    
         const categoriaCreada = await crearCategoriasService(req.body);
 
         res.status(201).json({
             mensaje: "Categoría creada correctamente",
             categoria: categoriaCreada
         });
-
-    } catch (error) {
-        next(error);
-    }
-};
+   };
 
 
 export const actualizarCategoriaController = async (req, res, next) => {
-    try {
+   
         const { id } = req.params;
 
         const categoriaActualizada = await actualizarCategoriaService(id, req.body);
@@ -64,14 +53,10 @@ export const actualizarCategoriaController = async (req, res, next) => {
             categoria: categoriaActualizada
         });
 
-    } catch (error) {
-        next(error);
-    }
 };
 
 
 export const eliminarCategoriaController = async (req, res, next) => {
-    try {
         const { id } = req.params;
 
         const categoriaEliminada = await eliminarCategoriaService(id);
@@ -80,10 +65,6 @@ export const eliminarCategoriaController = async (req, res, next) => {
             mensaje: "Categoría eliminada correctamente",
             categoria: categoriaEliminada
         });
-
-    } catch (error) {
-        next(error);
-    }
 };
 
 

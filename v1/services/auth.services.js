@@ -15,7 +15,10 @@ export const registrarUsuarioService = async (usuario) => {
 
   const nuevoUsuario = new Usuario(usuario);
 
-  await nuevoUsuario.save(); // acá se ejecuta el pre-save
+  await nuevoUsuario.save(); // acá corre el pre-save (hash password)
+
+  // recién ahora podés transformar el objeto
+  const { password, ...usuarioSinPassword } = nuevoUsuario.toObject();
 
   const token = jwt.sign(
     {
@@ -28,7 +31,7 @@ export const registrarUsuarioService = async (usuario) => {
   );
 
   return {
-    usuario: nuevoUsuario,
+    usuario: usuarioSinPassword,
     token
   };
 };

@@ -1,4 +1,4 @@
-export const authorizeRoles = (...rolesPermitidos) => {
+export const authorizeRoles = (roles = []) => {
     return (req, res, next) => {
         if (!req.usuario) {
             const error = new Error("Usuario no autenticado");
