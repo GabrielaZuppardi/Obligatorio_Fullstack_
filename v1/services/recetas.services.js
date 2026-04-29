@@ -38,29 +38,36 @@ export const obtenerRecetasService = async (page, limit) => {
     return { recetas, totalRecetas, totalPages, page, limit };
 }
 
-export const obtenerRecetaPorIdService = async (id) => {
+export const obtenerRecetaPorIdService = async (id, usuarioLogueado) => {
+  if (!isValidObjectId(id)) {
+    const error = new Error("El id no es válido");
+    error.status = 400;
+    throw error;
+  }
 
-    // 🔹 Validar id
-    if (!isValidObjectId(id)) {
-        const error = new Error("El id no es válido");
-        error.status = 400;
-        throw error;
-    }
+  const receta = await Receta.findById(id)
+    .populate("usuario", "nombre")
+    .populate("categoria", "nombre");
 
-    const receta = await Receta.findById(id)
-        .populate("usuario", "nombre")
-        .populate("categoria", "nombre");
+  if (!receta) {
+    const error = new Error("No se encontró la receta");
+    error.status = 404;
+    error.details = { id };
+    throw error;
+  }
 
-    // 🔹 Validar existencia
-    if (!receta) {
-        const error = new Error("No se encontró la receta");
-        error.status = 404;
-        error.details = { id };
-        throw error;
-    }
+  if (
+    //Si no es dueño de la receta y tampoco es administrador, no puede acceder.
+    receta.usuario._id.toString() !== usuarioLogueado.id &&
+    usuarioLogueado.rol !== "administrador"
+  ) {
+    const error = new Error("No tenés permiso para acceder a esta receta");
+    error.status = 403;
+    throw error;
+  }
 
-    return receta;
-}; 
+  return receta;
+};
 
 export const crearRecetaService = async (receta, usuarioId) => {
 
@@ -129,93 +136,103 @@ console.log("RECETA GUARDADA:", nuevaReceta._id);
     return nuevaReceta;
 };
 
-export const actualizarRecetaService = async (id, receta, usuarioId) => {
-    if (!isValidObjectId(id)) {
-        const error = new Error("El id no es válido");
-        error.status = 400;
-        throw error;
+export const actualizarRecetaService = async (id, receta, usuarioLogueado) => {
+  if (!isValidObjectId(id)) {
+    const error = new Error("El id no es válido");
+    error.status = 400;
+    throw error;
+  }
+
+  const recetaExistente = await Receta.findById(id);
+
+  if (!recetaExistente) {
+    const error = new Error("No se encontró la receta");
+    error.status = 404;
+    throw error;
+  }
+
+  if (
+    !recetaExistente.usuario.equals(usuarioLogueado.id) &&
+    usuarioLogueado.rol !== "administrador"
+  ) {
+    const error = new Error("No tenés permiso para modificar esta receta");
+    error.status = 403;
+    throw error;
+  }
+
+  const { categoria, titulo } = receta;
+  const datosActualizados = { ...receta };
+
+  if (categoria) {
+    if (!isValidObjectId(categoria)) {
+      const error = new Error("El id de la categoría no es válido");
+      error.status = 400;
+      throw error;
     }
 
-    const recetaExistente = await Receta.findById(id);
+    const categoriaExiste = await Categoria.findById(categoria);
 
-    if (!recetaExistente) {
-        const error = new Error("No se encontró la receta");
-        error.status = 404;
-        throw error;
+    if (!categoriaExiste) {
+      const error = new Error("No se encontró la categoría");
+      error.status = 404;
+      throw error;
+    }
+  }
+
+  if (titulo) {
+    const recetaDuplicada = await Receta.findOne({
+      titulo: titulo.trim().toLowerCase(),
+      usuario: recetaExistente.usuario,
+      _id: { $ne: id }
+    });
+
+    if (recetaDuplicada) {
+      const error = new Error("Ya existe una receta con ese título para este usuario");
+      error.status = 409;
+      throw error;
     }
 
-    if (!recetaExistente.usuario.equals(usuarioId)) {
-        const error = new Error("No tenés permiso para modificar esta receta");
-        error.status = 403;
-        throw error;
-    }
+    datosActualizados.titulo = titulo.trim();
+  }
 
-    const { categoria, titulo } = receta;
+  delete datosActualizados.usuario;
 
-    const datosActualizados = { ...receta };
+  const recetaActualizada = await Receta.findByIdAndUpdate(
+    id,
+    datosActualizados,
+    { returnDocument: "after", runValidators: true }
+  );
 
-    if (categoria) {
-        if (!isValidObjectId(categoria)) {
-            const error = new Error("El id de la categoría no es válido");
-            error.status = 400;
-            throw error;
-        }
-
-        const categoriaExiste = await Categoria.findById(categoria);
-
-        if (!categoriaExiste) {
-            const error = new Error("No se encontró la categoría");
-            error.status = 404;
-            throw error;
-        }
-    }
-
-    if (titulo) {
-        const recetaDuplicada = await Receta.findOne({
-            titulo: titulo.trim().toLowerCase(),
-            usuario: usuarioId,
-            _id: { $ne: id }
-        });
-
-        if (recetaDuplicada) {
-            const error = new Error("Ya existe una receta con ese título para este usuario");
-            error.status = 409;
-            throw error;
-        }
-
-        datosActualizados.titulo = titulo.trim();
-    }
-
-    delete datosActualizados.usuario;
-
-    const recetaActualizada = await Receta.findByIdAndUpdate(
-        id,
-        datosActualizados,
-        { returnDocument: "after" }
-    );
-
-    return recetaActualizada;
+  return recetaActualizada;
 };
 
-export const eliminarRecetaService = async (id) => {
+export const eliminarRecetaService = async (id, usuarioLogueado) => {
+  if (!isValidObjectId(id)) {
+    const error = new Error("El id no es válido");
+    error.status = 400;
+    throw error;
+  }
 
-    // Validar id
-    if (!isValidObjectId(id)) {
-        const error = new Error("El id no es válido");
-        error.status = 400;
-        throw error;
-    }
+  const receta = await Receta.findById(id);
 
-    const recetaEliminada = await Receta.findByIdAndDelete(id);
+  if (!receta) {
+    const error = new Error("No se encontró la receta");
+    error.status = 404;
+    throw error;
+  }
 
-    // Validar existencia
-    if (!recetaEliminada) {
-        const error = new Error("No se encontró la receta");
-        error.status = 404;
-        throw error;
-    }
+  if (
+    !receta.usuario.equals(usuarioLogueado.id) &&
+    usuarioLogueado.rol !== "administrador"
+  ) {
+    const error = new Error("No tenés permiso para eliminar esta receta");
+    error.status = 403;
+    throw error;
+  }
 
-    return recetaEliminada;
+  const recetaEliminada = await Receta.findByIdAndDelete(id);
+
+  return recetaEliminada;
 };
 
 export const buscarRecetasExternasService = async ({
@@ -251,6 +268,8 @@ const params = {
   return response.data;
 };
 
+//El primer service habla con Gemini
+//El service generarDescripcionRecetaService(receta) es auxiliar interno, no lleva controller propio.
 export const generarDescripcionRecetaService = async (receta) => {
   const prompt = `
   Generá una descripción breve (máximo 2 líneas) para esta receta:
@@ -294,10 +313,47 @@ export const generarDescripcionRecetaService = async (receta) => {
   }
 };
 
+//aplica BOLA, llama a Gemini y guarda la receta.
+export const generarDescripcionParaRecetaService = async (id, usuarioLogueado) => {
+  if (!isValidObjectId(id)) {
+    const error = new Error("El id no es válido");
+    error.status = 400;
+    throw error;
+  }
+
+  const receta = await Receta.findById(id).populate("categoria", "nombre");
+
+  if (!receta) {
+    const error = new Error("No se encontró la receta");
+    error.status = 404;
+    throw error;
+  }
+
+  if (
+    !receta.usuario.equals(usuarioLogueado.id) &&
+    usuarioLogueado.rol !== "administrador"
+  ) {
+    const error = new Error("No tenés permiso para modificar esta receta");
+    error.status = 403;
+    throw error;
+  }
+
+  const descripcion = await generarDescripcionRecetaService(receta);
+
+  if (!descripcion) {
+  const error = new Error("No se pudo generar la descripción con IA");
+  error.status = 503;
+  throw error;
+}
+
+  receta.descripcion = descripcion;
+  await receta.save();
+
+  return receta;
+};
+
 export const generarRecetaService = async ({ ingredientes, dificultad, tiempoMaximo }) => {
   try {
-    console.log("ESTE ES MI SERVER LOCAL");
-
     const API_KEY = process.env.GEMINI_25_API_KEY;
 
     if (!API_KEY) {
@@ -352,7 +408,10 @@ Respondé SOLO en JSON con:
       .replace(/```/g, "")
       .trim();
 
-    return JSON.parse(textoLimpio);
+    return {
+      fallback: false,
+      receta: JSON.parse(textoLimpio)
+    };
 
   } catch (error) {
     console.error("Error IA completo:", {
@@ -361,47 +420,24 @@ Respondé SOLO en JSON con:
       data: error.response?.data
     });
 
-    return null;
+    return {
+      fallback: true,
+      receta: {
+        titulo: "Receta sugerida manual",
+        descripcion: "Podés crear una receta con los ingredientes proporcionados.",
+        ingredientes: ingredientes || [],
+        pasos: [
+          "Seleccionar ingredientes",
+          "Definir método de cocción",
+          "Preparar y cocinar",
+          "Servir"
+        ],
+        tiempoPreparacion: tiempoMaximo || 30,
+        dificultad: dificultad || "media",
+        porciones: 2
+      }
+    };
   }
-};
-
-export const obtenerRecetasPorDificultadService = async (dificultad, page, limit) => {
-
-    if (!dificultad) {
-        const error = new Error("La dificultad es obligatoria");
-        error.status = 400;
-        throw error;
-    }
-
-    if (!["facil", "media", "dificil"].includes(dificultad)) {
-        const error = new Error("Dificultad inválida");
-        error.status = 400;
-        throw error;
-    }
-
-    limit = Number(limit) || 3;
-    page = Number(page) || 1;
-
-    if (page < 1 || limit < 1) {
-        const error = new Error("Page y limit deben ser números mayores a 0");
-        error.status = 400;
-        throw error;
-    }
-
-    const skip = (page - 1) * limit;
-
-    const filtro = { dificultad };
-
-    const totalRecetas = await Receta.countDocuments(filtro);
-    const totalPages = Math.ceil(totalRecetas / limit);
-
-    const recetas = await Receta.find(filtro)
-        .populate("usuario", "nombre")
-        .populate("categoria", "nombre")
-        .skip(skip)
-        .limit(limit);
-
-    return { recetas, totalRecetas, totalPages, page, limit };
 };
 
 
