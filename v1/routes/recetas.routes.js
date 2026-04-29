@@ -8,11 +8,16 @@ import {obtenerRecetasController,
         buscarRecetasExternasController,
         generarDescripcionRecetaController,
         generarRecetaController,
+        obtenerRecetasConFiltrosController
        } from "../controllers/recetas.controllers.js";
        
 import { validateBody } from "../middlewares/validateBody.middleware.js";
-import { crearRecetaSchema, modificarRecetaSchema } from "../validators/receta.validator.js";
+import { validateQuery } from "../middlewares/validateQuery.middleware.js";
 import { authenticateMiddleware } from "../middlewares/authenticate.middleware.js";
+
+import { crearRecetaSchema, modificarRecetaSchema } from "../validators/receta.validator.js";
+
+import { filtrosRecetaSchema } from "../validators/recetaQuery.validator.js";
 
 const router = express.Router();
 
@@ -20,11 +25,17 @@ const router = express.Router();
 
 
 // Rutas especiales primero
-router.post("/:id/generar-descripcion", authenticateMiddleware, generarDescripcionRecetaController);
-router.post("/generar", generarRecetaController);
-router.get("/externas", buscarRecetasExternasController);
-router.get("/mias", authenticateMiddleware, obtenerMisRecetasController);
 
+// Rutas especiales primero
+router.get("/filtros", validateQuery(filtrosRecetaSchema), obtenerRecetasConFiltrosController);
+//genera una receta con ia al pasarle ingredientes, tiempo y dificultad por query
+router.post("/generar", generarRecetaController);
+//obtiene recetas externas de una api externa al pasarle una query por query EJEMPLO:{{prod_base_url}}/recetas/externas?query=pollo
+router.get("/externas", buscarRecetasExternasController); //busca recetas externas con 3 filtros
+router.get("/mias", obtenerMisRecetasController);
+
+// Rutas con :id después
+router.post("/:id/generar-descripcion", generarDescripcionRecetaController);
 
 // CRUD base
 router.get("/", obtenerRecetasController);
@@ -33,7 +44,6 @@ router.get("/:id", obtenerRecetaPorIdController);
 router.post("/", validateBody(crearRecetaSchema), crearRecetaController);
 router.patch("/:id", validateBody(modificarRecetaSchema), actualizarRecetaController);
 router.delete("/:id", eliminarRecetaController);
-
 
 
 export default router;

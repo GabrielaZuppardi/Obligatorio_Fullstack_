@@ -8,7 +8,8 @@ import {obtenerRecetasService,
         obtenerMisRecetasService,
         buscarRecetasExternasService, 
         generarDescripcionRecetaService,
-        generarRecetaService} from "../services/recetas.services.js";
+        generarRecetaService,
+      obtenerRecetasConFiltrosService} from "../services/recetas.services.js";
 
  
  export const obtenerMisRecetasController = async (req, res, next) => {
@@ -106,7 +107,7 @@ export const eliminarRecetaController = async (req, res, next) => {
 };
 
 export const buscarRecetasExternasController = async (req, res, next) => {
-
+  try {
     const { query } = req.query;
 
     if (!query) {
@@ -115,14 +116,16 @@ export const buscarRecetasExternasController = async (req, res, next) => {
       throw error;
     }
 
-    const resultado = await buscarRecetasExternasService(query);
+    const resultado = await buscarRecetasExternasService(req.query);
 
     res.status(200).json({
       mensaje: "Recetas externas obtenidas correctamente",
       ...resultado
     });
 
- 
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const generarDescripcionRecetaController = async (req, res, next) => {
@@ -196,3 +199,37 @@ export const generarDescripcionRecetaController = async (req, res, next) => {
 
     };
 
+export const obtenerRecetasPorDificultadController = async (req, res, next) => {
+    try {
+        const { dificultad } = req.query;
+        const { page, limit } = req.query;
+
+        const resultado = await obtenerRecetasPorDificultadService(
+            dificultad,
+            page,
+            limit
+        );
+
+        res.status(200).json({
+            mensaje: "Recetas obtenidas correctamente",
+            ...resultado
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const obtenerRecetasConFiltrosController = async (req, res, next) => {
+  try {
+    const resultado = await obtenerRecetasConFiltrosService(req.query);
+
+    res.status(200).json({
+      mensaje: "Recetas filtradas correctamente",
+      ...resultado
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};

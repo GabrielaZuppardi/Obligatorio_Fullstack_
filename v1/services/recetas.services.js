@@ -218,15 +218,34 @@ export const eliminarRecetaService = async (id) => {
     return recetaEliminada;
 };
 
-export const buscarRecetasExternasService = async (query) => {
+export const buscarRecetasExternasService = async ({
+  query,
+  maxReadyTime,
+  number
+  
+}) => {
+
+const params = {
+  query,
+  number: number || 5,
+  addRecipeInformation: true,
+  apiKey: process.env.SPOONACULAR_API_KEY
+};
+
+
+  if (maxReadyTime) {
+    params.maxReadyTime = maxReadyTime;
+  }
+
+  if (number) {
+    params.number = number;
+  } else {
+    params.number = 5; // default
+  }
+
   const response = await axios.get(
     "https://api.spoonacular.com/recipes/complexSearch",
-    {
-      params: {
-        query,
-        apiKey: process.env.SPOONACULAR_API_KEY
-      }
-    }
+    { params }
   );
 
   return response.data;
@@ -344,4 +363,121 @@ Respondé SOLO en JSON con:
 
     return null;
   }
+};
+
+export const obtenerRecetasPorDificultadService = async (dificultad, page, limit) => {
+
+    if (!dificultad) {
+        const error = new Error("La dificultad es obligatoria");
+        error.status = 400;
+        throw error;
+    }
+
+    if (!["facil", "media", "dificil"].includes(dificultad)) {
+        const error = new Error("Dificultad inválida");
+        error.status = 400;
+        throw error;
+    }
+
+    limit = Number(limit) || 3;
+    page = Number(page) || 1;
+
+    if (page < 1 || limit < 1) {
+        const error = new Error("Page y limit deben ser números mayores a 0");
+        error.status = 400;
+        throw error;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const filtro = { dificultad };
+
+    const totalRecetas = await Receta.countDocuments(filtro);
+    const totalPages = Math.ceil(totalRecetas / limit);
+
+    const recetas = await Receta.find(filtro)
+        .populate("usuario", "nombre")
+        .populate("categoria", "nombre")
+        .skip(skip)
+        .limit(limit);
+
+    return { recetas, totalRecetas, totalPages, page, limit };
+};
+
+
+export const obtenerRecetasConFiltrosService = async ({
+  dificultad,
+  categoria,
+  tiempoMin,
+  tiempoMax,
+  ingrediente,
+  ingredientes,
+  page = 1,
+  limit = 3
+}) => {
+  const filtro = {};
+
+  if (dificultad) {
+    filtro.dificultad = dificultad;
+  }
+
+  if (categoria) {
+    filtro.categoria = categoria;
+  }
+
+  if (tiempoMin || tiempoMax) {
+    filtro.tiempoPreparacion = {};
+
+    if (tiempoMin) {
+      filtro.tiempoPreparacion.$gte = tiempoMin;
+    }
+
+    if (tiempoMax) {
+      filtro.tiempoPreparacion.$lte = tiempoMax;
+    }
+  }
+
+  if (ingrediente && ingredientes) {
+    const error = new Error("Usá 'ingrediente' o 'ingredientes', no ambos");
+    error.status = 400;
+    throw error;
+  }
+
+  if (ingrediente) {
+    filtro.ingredientes = {
+      $regex: ingrediente,
+      $options: "i"
+    };
+  }
+
+  if (ingredientes) {
+    const listaIngredientes = ingredientes
+      .split(",")
+      .map(i => i.trim())
+      .filter(i => i.length > 0);
+
+    filtro.ingredientes = {
+      $all: listaIngredientes.map(i => new RegExp(i, "i"))
+    };
+  }
+
+  const skip = (page - 1) * limit;
+
+  const totalRecetas = await Receta.countDocuments(filtro);
+  const totalPages = Math.ceil(totalRecetas / limit);
+
+  const recetas = await Receta.find(filtro)
+    .populate("usuario", "nombre")
+    .populate("categoria", "nombre")
+    .skip(skip)
+    .limit(limit);
+
+  return {
+    recetas,
+    totalRecetas,
+    totalPages,
+    page,
+    limit,
+    filtrosAplicados: filtro
+  };
 };
