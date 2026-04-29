@@ -336,13 +336,12 @@ export const generarDescripcionParaRecetaService = async (id, usuarioLogueado) =
     throw error;
   }
 
-  const descripcion = await generarDescripcionRecetaService(receta);
+  let descripcion = await generarDescripcionRecetaService(receta);
 
+  // 🔹 Fallback si falla la IA
   if (!descripcion) {
-  const error = new Error("No se pudo generar la descripción con IA");
-  error.status = 503;
-  throw error;
-}
+    descripcion = `Receta de ${receta.titulo}, preparada con ingredientes seleccionados y pensada para una elaboración sencilla.`;
+  }
 
   receta.descripcion = descripcion;
   await receta.save();

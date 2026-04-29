@@ -102,19 +102,7 @@ export const crearRecetaController = async (req, res, next) => {
     }
 };
 
-/*
-export const actualizarRecetaController = async (req, res, next) => {
-   
-        const { id } = req.params;
 
-        const recetaActualizada = await actualizarRecetaService(id, req.body);
-
-        res.status(200).json({
-            mensaje: "Receta actualizada correctamente",
-            receta: recetaActualizada
-        });
-
-};*/
 
 export const actualizarRecetaController = async (req, res, next) => {
   const { id } = req.params;
