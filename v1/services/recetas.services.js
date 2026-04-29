@@ -238,34 +238,52 @@ export const buscarRecetasExternasService = async ({
   page = 1,
   limit = 5
 }) => {
-
-  const offset = (page - 1) * limit;
-
-  const params = {
-    query,
-    number: limit,
-    offset,
-    addRecipeInformation: true,
-    apiKey: process.env.SPOONACULAR_API_KEY
-  };
-
-  if (maxReadyTime) {
-    params.maxReadyTime = maxReadyTime;
+  // 🔹 Validar API KEY
+  if (!process.env.SPOONACULAR_API_KEY) {
+    const error = new Error("No está configurada la API key de Spoonacular");
+    error.status = 500;
+    throw error;
   }
 
-  const response = await axios.get(
-    "https://api.spoonacular.com/recipes/complexSearch",
-    { params }
-  );
+  try {
+    const offset = (page - 1) * limit;
 
-  return {
-    resultados: response.data.results,
-    total: response.data.totalResults,
-    page,
-    totalPages: Math.ceil(response.data.totalResults / limit)
-  };
+    const params = {
+      query,
+      number: limit,
+      offset,
+      addRecipeInformation: true,
+      apiKey: process.env.SPOONACULAR_API_KEY
+    };
+
+    if (maxReadyTime) {
+      params.maxReadyTime = maxReadyTime;
+    }
+
+    const response = await axios.get(
+      "https://api.spoonacular.com/recipes/complexSearch",
+      { params }
+    );
+
+    return {
+      resultados: response.data.results,
+      total: response.data.totalResults,
+      page,
+      totalPages: Math.ceil(response.data.totalResults / limit)
+    };
+
+  } catch (error) {
+    console.error("Error Spoonacular:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+
+    const nuevoError = new Error("No se pudieron obtener recetas externas");
+    nuevoError.status = 503;
+    throw nuevoError;
+  }
 };
-
 //El primer service habla con Gemini
 //El service generarDescripcionRecetaService(receta) es auxiliar interno, no lleva controller propio.
 export const generarDescripcionRecetaService = async (receta) => {
@@ -436,7 +454,6 @@ Respondé SOLO en JSON con:
     };
   }
 };
-
 
 export const obtenerRecetasConFiltrosService = async ({
   dificultad,

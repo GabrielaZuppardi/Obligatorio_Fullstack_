@@ -8,8 +8,9 @@ import {obtenerRecetasController,
         buscarRecetasExternasController,
         generarDescripcionRecetaController,
         generarRecetaController,
-        obtenerRecetasConFiltrosController
-       } from "../controllers/recetas.controllers.js";
+        obtenerRecetasConFiltrosController,
+        
+      } from "../controllers/recetas.controllers.js";
        
 import { validateBody } from "../middlewares/validateBody.middleware.js";
 import { validateQuery } from "../middlewares/validateQuery.middleware.js";

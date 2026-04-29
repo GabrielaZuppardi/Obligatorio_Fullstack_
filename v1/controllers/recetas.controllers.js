@@ -9,7 +9,6 @@ import {obtenerRecetasService,
         buscarRecetasExternasService, 
         generarDescripcionRecetaService,
         generarDescripcionParaRecetaService,
-        generarRecetaService,
         obtenerRecetasConFiltrosService} from "../services/recetas.services.js";
 import { runMulterSingle } from "../utils/multer.util.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -58,8 +57,6 @@ export const obtenerRecetaPorIdController = async (req, res, next) => {
   }
 };
 
-
-
 export const crearRecetaController = async (req, res, next) => {
     try {
         const usuarioId = req.usuario.id;
@@ -101,8 +98,6 @@ export const crearRecetaController = async (req, res, next) => {
         next(error);
     }
 };
-
-
 
 export const actualizarRecetaController = async (req, res, next) => {
   const { id } = req.params;
