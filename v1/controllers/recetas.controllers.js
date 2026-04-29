@@ -183,7 +183,7 @@ export const generarRecetaController = async (req, res) => {
 
 export const obtenerRecetasConFiltrosController = async (req, res, next) => {
   try {
-    const resultado = await obtenerRecetasConFiltrosService(req.query);
+    const resultado = await obtenerRecetasConFiltrosService(req.validatedQuery);
 
     res.status(200).json({
       mensaje: "Recetas filtradas correctamente",
