@@ -4,6 +4,8 @@ import categoriasRouter from './routes/categorias.routes.js';
 import authRouter from "./routes/auth.routes.js";
 import recetasRouter from './routes/recetas.routes.js';
 import usuariosRouter from './routes/usuarios.routes.js';
+import uploadsRouter from './routes/uploads.routes.js';
+import { upload } from './middlewares/multer.middleware.js';
 
 
 const router = express.Router({mergeParams: true });
@@ -18,6 +20,6 @@ router.use(authenticateMiddleware); //todas las rutas debajo de esta línea esta
 router.use("/usuarios", usuariosRouter);
 router.use("/categorias", categoriasRouter);
 router.use("/recetas", recetasRouter);  
-
+router.use("/uploads", uploadsRouter);
 
 export default router;

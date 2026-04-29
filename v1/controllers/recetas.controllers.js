@@ -54,18 +54,53 @@ export const obtenerRecetaPorIdController = async (req, res, next) => {
   }
 };
 
-export const crearRecetaController = async (req, res, next) => {
-  
-        const usuarioId = req.usuario.id; 
+import { runMulterSingle } from "../utils/multer.util.js";
+import { upload } from "../middlewares/multer.middleware.js";
+import cloudinary from "../config/cloudinary.js";
+import { uploadBufferToCloudinary } from "../utils/cloudinary.util.js";
 
-        const recetaCreada = await crearRecetaService(req.body, usuarioId);
+export const crearRecetaController = async (req, res, next) => {
+    try {
+        const usuarioId = req.usuario.id;
+
+        // 🔹 Procesar imagen con multer
+        await runMulterSingle(upload, "imagen", req, res);
+
+        let imagenUrl = null;
+        let imagenPublicId = null;
+
+        if (req.file) {
+            const result = await uploadBufferToCloudinary(
+                cloudinary,
+                req.file.buffer,
+                {
+                    resource_type: "auto",
+                    folder: "recetas"
+                }
+            );
+
+            imagenUrl = result.secure_url;
+            imagenPublicId = result.public_id;
+        }
+
+        const datosReceta = {
+            ...req.body,
+            imagenUrl,
+            imagenPublicId
+        };
+
+        const recetaCreada = await crearRecetaService(datosReceta, usuarioId);
 
         res.status(201).json({
             mensaje: "Receta creada correctamente",
             receta: recetaCreada
         });
- 
-  };
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 /*
 export const actualizarRecetaController = async (req, res, next) => {
    

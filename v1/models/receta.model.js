@@ -40,9 +40,12 @@ const recetaSchema = new mongoose.Schema(
       required: true,
       min: 1
     },
-    imageUrl: {
-      type: String
-    },
+   imagenUrl: {
+  type: String
+},
+imagenPublicId: {
+  type: String
+},
 
     usuario: {
       type: mongoose.Schema.Types.ObjectId,

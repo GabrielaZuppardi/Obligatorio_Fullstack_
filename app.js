@@ -1,3 +1,5 @@
+import "dotenv/config"; // Cargar variables de entorno desde el archivo .env
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
