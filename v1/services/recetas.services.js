@@ -14,17 +14,14 @@ export const obtenerMisRecetasService = async (usuarioId, page, limit) => {
     const recetas = await Receta.find({ usuario: usuarioId })
         .skip(skip) //saltea las primeras 2 recetas
         .limit(limit);//limita el resultado a 3 recetas 
-       /* console.log("usuarioId:", usuarioId);
-        console.log("page:", page);
-        console.log("limit:", limit);
-        console.log("skip:", skip);*/
+   
 
     return { recetas, totalRecetas, totalPages, page, limit };
 }
 
 export const obtenerRecetasService = async (page, limit) => {
 
-    limit=Number(limit) || 3; //si no se envía un límite, se establece en 10 por defecto
+    limit=Number(limit) || 3; //si no se envía un límite, se establece en 3 por defecto
     page=Number(page) || 1; //si no se envía un número de página, se establece en 1 por defecto
     const skip = (page - 1) * limit; //calcula cuántos documentos saltar según la página y el límite
     const totalRecetas = await Receta.countDocuments(); //cuenta el total de recetas del usuario
@@ -102,7 +99,7 @@ export const crearRecetaService = async (receta, usuarioId) => {
     }
 
     const recetaExistente = await Receta.findOne({
-        titulo: titulo.trim(),
+        titulo: titulo.trim().toLowerCase(),
         usuario: usuarioId
     });
 
@@ -238,26 +235,22 @@ export const eliminarRecetaService = async (id, usuarioLogueado) => {
 export const buscarRecetasExternasService = async ({
   query,
   maxReadyTime,
-  number
-  
+  page = 1,
+  limit = 5
 }) => {
 
-const params = {
-  query,
-  number: number || 5,
-  addRecipeInformation: true,
-  apiKey: process.env.SPOONACULAR_API_KEY
-};
+  const offset = (page - 1) * limit;
 
+  const params = {
+    query,
+    number: limit,
+    offset,
+    addRecipeInformation: true,
+    apiKey: process.env.SPOONACULAR_API_KEY
+  };
 
   if (maxReadyTime) {
     params.maxReadyTime = maxReadyTime;
-  }
-
-  if (number) {
-    params.number = number;
-  } else {
-    params.number = 5; // default
   }
 
   const response = await axios.get(
@@ -265,7 +258,12 @@ const params = {
     { params }
   );
 
-  return response.data;
+  return {
+    resultados: response.data.results,
+    total: response.data.totalResults,
+    page,
+    totalPages: Math.ceil(response.data.totalResults / limit)
+  };
 };
 
 //El primer service habla con Gemini

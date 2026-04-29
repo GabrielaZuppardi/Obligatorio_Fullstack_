@@ -15,5 +15,5 @@ export const authenticateMiddleware = (req, res, next) => {
    });
 }
 
-/*“Uso req.usuario para guardar el payload del token decodificado.
+/*Uso req.usuario para guardar el payload del token decodificado.
 Es equivalente a req.decoded, pero lo nombro según el dominio de la aplicación*/

@@ -14,9 +14,7 @@ export const obtenerUsuariosController = async (req, res, next) => {
         res.status(200).json({
             mensaje: "Usuarios obtenidos correctamente",
             ...respuesta
-        });
-
-    
+        });   
 };
 
 export const obtenerUsuarioPorIdController = async (req, res, next) => {

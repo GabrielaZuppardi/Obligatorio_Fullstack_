@@ -8,9 +8,13 @@ import {obtenerRecetasService,
         obtenerMisRecetasService,
         buscarRecetasExternasService, 
         generarDescripcionRecetaService,
+        generarDescripcionParaRecetaService,
         generarRecetaService,
         obtenerRecetasConFiltrosService} from "../services/recetas.services.js";
-
+import { runMulterSingle } from "../utils/multer.util.js";
+import { upload } from "../middlewares/multer.middleware.js";
+import cloudinary from "../config/cloudinary.js";
+import { uploadBufferToCloudinary } from "../utils/cloudinary.util.js";
  
  export const obtenerMisRecetasController = async (req, res, next) => {
     
@@ -54,16 +58,13 @@ export const obtenerRecetaPorIdController = async (req, res, next) => {
   }
 };
 
-import { runMulterSingle } from "../utils/multer.util.js";
-import { upload } from "../middlewares/multer.middleware.js";
-import cloudinary from "../config/cloudinary.js";
-import { uploadBufferToCloudinary } from "../utils/cloudinary.util.js";
+
 
 export const crearRecetaController = async (req, res, next) => {
     try {
         const usuarioId = req.usuario.id;
 
-        // 🔹 Procesar imagen con multer
+        // Procesar imagen con multer
         await runMulterSingle(upload, "imagen", req, res);
 
         let imagenUrl = null;
