@@ -112,7 +112,6 @@ export const crearRecetaService = async (receta, usuarioId) => {
     if (usuarioExiste.plan === "plus") {
         const cantidadRecetas = await Receta.countDocuments({
               usuario: usuarioExiste._id
-           
         });
 
         if (cantidadRecetas >= 4) {
