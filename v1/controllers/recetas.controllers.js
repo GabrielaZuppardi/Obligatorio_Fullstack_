@@ -9,7 +9,8 @@ import {obtenerRecetasService,
         buscarRecetasExternasService, 
         generarDescripcionRecetaService,
         generarDescripcionParaRecetaService,
-        obtenerRecetasConFiltrosService} from "../services/recetas.services.js";
+        obtenerRecetasConFiltrosService, 
+        generarRecetaService} from "../services/recetas.services.js";
 import { runMulterSingle } from "../utils/multer.util.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import cloudinary from "../config/cloudinary.js";
