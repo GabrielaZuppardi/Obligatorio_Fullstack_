@@ -4,12 +4,12 @@ import {
     loginUsuario
 } from "../controllers/auth.controllers.js";
 import { validateBody } from "../middlewares/validateBody.middleware.js";
-import { crearUsuarioSchema, modificarUsuarioSchema } from "../validators/usuario.validator.js";
+import { crearUsuarioSchema, loginSchema } from "../validators/usuario.validator.js";
 
 
 const router = express.Router({ mergeParams: true });
 
 router.post("/registro", validateBody(crearUsuarioSchema), registrarUsuario);
-router.post("/login", loginUsuario);
+router.post("/login", validateBody(loginSchema), loginUsuario);
 
 export default router;
