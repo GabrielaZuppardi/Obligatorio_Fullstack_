@@ -365,46 +365,6 @@ Respondé SOLO en JSON con:
   }
 };
 
-export const obtenerRecetasPorDificultadService = async (dificultad, page, limit) => {
-
-    if (!dificultad) {
-        const error = new Error("La dificultad es obligatoria");
-        error.status = 400;
-        throw error;
-    }
-
-    if (!["facil", "media", "dificil"].includes(dificultad)) {
-        const error = new Error("Dificultad inválida");
-        error.status = 400;
-        throw error;
-    }
-
-    limit = Number(limit) || 3;
-    page = Number(page) || 1;
-
-    if (page < 1 || limit < 1) {
-        const error = new Error("Page y limit deben ser números mayores a 0");
-        error.status = 400;
-        throw error;
-    }
-
-    const skip = (page - 1) * limit;
-
-    const filtro = { dificultad };
-
-    const totalRecetas = await Receta.countDocuments(filtro);
-    const totalPages = Math.ceil(totalRecetas / limit);
-
-    const recetas = await Receta.find(filtro)
-        .populate("usuario", "nombre")
-        .populate("categoria", "nombre")
-        .skip(skip)
-        .limit(limit);
-
-    return { recetas, totalRecetas, totalPages, page, limit };
-};
-
-
 export const obtenerRecetasConFiltrosService = async ({
   dificultad,
   categoria,
